@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
@@ -6,17 +7,21 @@ public class Enemy : MonoBehaviour
     [SerializeField] private int maxHealth = 50;
     [SerializeField] private int damage = 10;
     [SerializeField] private float moveSpeed = 2f;
-    [SerializeField] private float attackRange = 1.5f;
+    [SerializeField] private float attackRange = 5.0f;
     [SerializeField] private float attackCooldown = 1f;
     
     private int currentHealth;
     private Transform player;
+    NavMeshAgent navAgent;
     private float lastAttackTime;
     
     void Start()
     {
         currentHealth = maxHealth;
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
+        navAgent = GetComponent<NavMeshAgent>();
+        navAgent.updateRotation = false;
+        navAgent.updateUpAxis = false;
     }
     
     void Update()
@@ -28,7 +33,7 @@ public class Enemy : MonoBehaviour
         // Se estiver longe, persegue o jogador
         if (distanceToPlayer > attackRange)
         {
-            ChasePlayer();
+            navAgent.SetDestination(player.position);
         }
         // Se estiver perto, ataca
         else if (Time.time >= lastAttackTime + attackCooldown)

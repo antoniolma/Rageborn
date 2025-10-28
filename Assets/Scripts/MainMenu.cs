@@ -31,7 +31,7 @@ public class MainMenu : MonoBehaviour
     // Botão "Jogar"
     public void IniciarJogo()
     {
-        SceneManager.LoadScene("GameScene");
+        SceneManager.LoadScene("Arena_Inferno");
     }
 
     // Botão "Opções"

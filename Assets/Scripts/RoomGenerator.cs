@@ -15,7 +15,8 @@ public class RoomGenerator : MonoBehaviour
         }
         else
         {
-            Debug.LogError("❌ Room Prefab não configurado no Inspector!");
+            ;
+            // Debug.LogError("❌ Room Prefab não configurado no Inspector!");
         }
         
         // Posiciona o player na sala
@@ -28,12 +29,13 @@ public class RoomGenerator : MonoBehaviour
         if (player != null)
         {
             Vector2 spawnOffset = new Vector2(5, 5); // Ajuste conforme necessário
-            player.transform.position = Vector2.zero;
-            Debug.Log("✅ Player posicionado na sala!");
+            // player.transform.position = Vector2.zero;
+            // Debug.Log("✅ Player posicionado na sala!");
         }
         else
         {
-            Debug.LogWarning("⚠️ Player não encontrado! Certifique-se que tem a tag 'Player'");
+            ;
+            // Debug.LogWarning("⚠️ Player não encontrado! Certifique-se que tem a tag 'Player'");
         }
     }
 }
