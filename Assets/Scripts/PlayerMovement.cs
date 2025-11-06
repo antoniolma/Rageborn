@@ -4,9 +4,12 @@ public class PlayerMovement : MonoBehaviour
 {
     private Rigidbody2D rb;
     [SerializeField] private Animator _animator;
-    [SerializeField] private SpriteRenderer spriteRenderer; 
+    [SerializeField] private SpriteRenderer spriteRenderer;
 
     public float speed;
+
+    // 0 = Fire, 1 = Ice, 2 = Elec
+    public int TypeSword;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

@@ -2,34 +2,16 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement Settings")]
-    [SerializeField] private float moveSpeed = 5f;
-    
     [Header("Health Settings")]
     [SerializeField] private int maxHealth = 100;
     private int currentHealth;
     
     private Rigidbody2D rb;
-    private Vector2 moveInput;
     
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
-    }
-    
-    void Update()
-    {
-        // Input de movimentação (WASD ou setas)
-        moveInput.x = Input.GetAxisRaw("Horizontal");
-        moveInput.y = Input.GetAxisRaw("Vertical");
-        moveInput.Normalize(); // Evita movimento mais rápido na diagonal
-    }
-    
-    void FixedUpdate()
-    {
-        // Aplica movimento usando física
-        rb.linearVelocity = moveInput * moveSpeed;
     }
     
     public void TakeDamage(int damage)
