@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 211861973178658416}
   - component: {fileID: 7387961398365395828}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: FireWorm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
