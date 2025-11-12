@@ -18,14 +18,15 @@ public class WeaponCollectable : MonoBehaviour
         ChangeSprite();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        PlayerMovement playerScript = collision.GetComponent<PlayerMovement>();
+        PlayerMovement playerCollided = collision.GetComponent<PlayerMovement>();
+        float buttonPressed = Input.GetAxis("Interact");
 
         // Se encontrou o Player colidindo
-        if (playerScript)
+        if (playerCollided && buttonPressed != 0)
         {
-            playerScript.TypeSword = TypeSword;
+            playerCollided.TypeSword = TypeSword;
             Destroy(this.gameObject);
         }
     }

@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5660565744113584659}
   - component: {fileID: 8883294100328716605}
   - component: {fileID: 7554011014191377525}
+  - component: {fileID: 7303114327939725459}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -79,7 +80,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1194179775
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 2
   m_Sprite: {fileID: 9128384846270689552, guid: ff8b8229e2f00ea40a551dc49ad457fc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -203,6 +204,24 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7303114327939725459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 295012727168760991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1bb23f991cf4ca4d8ca5f427534a77d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: {x: 0, y: -0.5}
+  shadowMaterial: {fileID: 2100000, guid: 3b716dd4ada282a4cbd0e51875b903b9, type: 2}
+  shadowColor: {r: 0, g: 0, b: 0, a: 0}
+  shadowScale: {x: 1.1, y: 0.4}
+  sortingOrderOffset: -1
+  casterSpriteRenderer: {fileID: 463129704846963285}
 --- !u!1 &2576776722306249422
 GameObject:
   m_ObjectHideFlags: 0
@@ -213,6 +232,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2489070070137778346}
   - component: {fileID: 4070331508138656456}
+  - component: {fileID: 1820731216760326090}
   m_Layer: 0
   m_Name: SwordTransform
   m_TagString: Untagged
@@ -290,6 +310,24 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1820731216760326090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2576776722306249422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1bb23f991cf4ca4d8ca5f427534a77d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: {x: 0, y: -2}
+  shadowMaterial: {fileID: 2100000, guid: 3b716dd4ada282a4cbd0e51875b903b9, type: 2}
+  shadowColor: {r: 0, g: 0, b: 0, a: 0}
+  shadowScale: {x: 1.1, y: 0.4}
+  sortingOrderOffset: -1
+  casterSpriteRenderer: {fileID: 0}
 --- !u!1 &6342405740583442257
 GameObject:
   m_ObjectHideFlags: 0
