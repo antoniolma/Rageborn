@@ -29,6 +29,12 @@ public class Enemy : MonoBehaviour
         if (player == null) return;
         
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+
+        Vector2 direction = (player.position - transform.position).normalized;
+        if (direction.x < 0)
+            transform.localScale = new Vector3(-1, 1, 1); // Olha pra esquerda
+        else if (direction.x > 0)
+            transform.localScale = new Vector3(1, 1, 1); // Olha pra direita
         
         // Se estiver longe, persegue o jogador
         if (distanceToPlayer > attackRange)
