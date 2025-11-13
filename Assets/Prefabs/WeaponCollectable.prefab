@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5763357660623481409}
   - component: {fileID: 4654190374991199318}
   - component: {fileID: 2411234344573789585}
+  - component: {fileID: 8929877776934259267}
   m_Layer: 0
   m_Name: WeaponCollectable
   m_TagString: Untagged
@@ -75,8 +76,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1189660721
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: -196478064, guid: ffc74e3548be0b04daae6a1c18498a0b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -151,3 +152,18 @@ MonoBehaviour:
   iceSwordSprite: {fileID: 1753369541, guid: 5db9b4d51eaa6794c9a4c20969c0815b, type: 3}
   venomSwordSprite: {fileID: 1330965007, guid: df6696df7563e004bb4e24484af1f2b7, type: 3}
   TypeSword: 0
+--- !u!114 &8929877776934259267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1081227928492990368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1bb23f991cf4ca4d8ca5f427534a77d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: {x: 0, y: -0.45}
+  shadowMaterial: {fileID: 2100000, guid: 3b716dd4ada282a4cbd0e51875b903b9, type: 2}
+  shadowColor: {r: 0, g: 0, b: 0, a: 0.7176471}

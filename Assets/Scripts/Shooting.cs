@@ -10,7 +10,11 @@ public class Shooting : MonoBehaviour
     private float fireTime;
     [SerializeField] private float cooldown;
 
+    // Jogador
+    private SpriteRenderer playerRnd;
+
     // Espada do Jogador
+    private Transform sword;
     [SerializeField] private PlayerMovement playerMovement;
 
     // Objects Tiro
@@ -40,12 +44,15 @@ public class Shooting : MonoBehaviour
         mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 
         // Player
-        // GameObject player = GameObject.FindGameObjectWithTag("Player");
-        playerMovement = GetComponentInParent<PlayerMovement>();
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        playerRnd = player.GetComponent<SpriteRenderer>();
+        playerMovement = player.GetComponent<PlayerMovement>();
 
         // Espada
-        Transform sword = transform.Find("SwordTransform");
+        sword = transform.Find("SwordTransform");
         swordRenderer = sword.GetComponent<SpriteRenderer>();
+        swordRenderer.sortingLayerName = playerRnd.sortingLayerName;
+        swordRenderer.sortingOrder = playerRnd.sortingOrder;
     }
 
     // Update is called once per frame
@@ -93,18 +100,30 @@ public class Shooting : MonoBehaviour
         {
             // Fire
             GameObject Bullet = Instantiate(FireBullet, swordTransform.position, Quaternion.identity);
+            Bullet.transform.rotation = sword.transform.rotation;
+            Bullet.GetComponent<SpriteRenderer>().sortingLayerName = swordRenderer.sortingLayerName;
+            Bullet.GetComponent<SpriteRenderer>().sortingOrder = swordRenderer.sortingOrder + 1;
+            Destroy(Bullet, 3);
             // Debug.Log("Fire!");
         }
         else if (TypeSword == 1)
         {
             // Ice
             GameObject Bullet = Instantiate(IceBullet, swordTransform.position, Quaternion.identity);
+            Bullet.transform.rotation = sword.transform.rotation;
+            Bullet.GetComponent<SpriteRenderer>().sortingLayerName = swordRenderer.sortingLayerName;
+            Bullet.GetComponent<SpriteRenderer>().sortingOrder = swordRenderer.sortingOrder + 1;
+            Destroy(Bullet, 3);
             // Debug.Log("Ice!");
         }
         else if (TypeSword == 2)
         {
             // Venom
             GameObject Bullet = Instantiate(VenomBullet, swordTransform.position, Quaternion.identity);
+            Bullet.transform.rotation = sword.transform.rotation;
+            Bullet.GetComponent<SpriteRenderer>().sortingLayerName = swordRenderer.sortingLayerName;
+            Bullet.GetComponent<SpriteRenderer>().sortingOrder = swordRenderer.sortingOrder + 1;
+            Destroy(Bullet, 3);
             // Debug.Log("Venom!");
         }
     }
