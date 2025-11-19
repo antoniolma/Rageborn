@@ -10,13 +10,12 @@ public class PlayerMovement : MonoBehaviour
 
     // 0 = Fire, 1 = Ice, 2 = Elec
     public int TypeSword;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
@@ -36,5 +35,16 @@ public class PlayerMovement : MonoBehaviour
 
         _animator.SetFloat("InputX", moveHorizontal);
         _animator.SetFloat("InputY", moveVertical);
+    }
+
+    // ✅ CORRIGIDO - agora usa 'speed' ao invés de 'moveSpeed'
+    public void UpdateSpeed(float newSpeed)
+    {
+        speed = newSpeed;
+    }
+
+    public void IncreaseSpeed(float amount)
+    {
+        speed += amount;
     }
 }

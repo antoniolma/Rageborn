@@ -78,7 +78,7 @@ public class Bullet : MonoBehaviour
         }
         
         // Verifica se colidiu com parede/obstáculo
-        if (collision.CompareTag("Wall") || collision.CompareTag("Obstacle"))
+        if (collision.CompareTag("Wall"))
         {
             SpawnHitEffect();
             Destroy(gameObject);

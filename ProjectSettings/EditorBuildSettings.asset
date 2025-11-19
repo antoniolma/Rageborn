@@ -9,11 +9,14 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: b307deaf3063dadc0b20257a6397bbd5
   - enabled: 1
+    path: Assets/Scenes/Arena_dungeon.unity
+    guid: b241a642886534c1798a19676801cb9d
+  - enabled: 1
     path: Assets/Scenes/Arena_Inferno.unity
     guid: 001ed393c7b197df3b8b475625eaa973
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
+    path: Assets/Scenes/Shop_Dungeon.unity
+    guid: a1772eb9221726cd687a68e9d57b694f
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

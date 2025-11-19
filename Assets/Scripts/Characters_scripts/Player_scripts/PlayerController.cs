@@ -10,6 +10,9 @@ public class PlayerController : MonoBehaviour
     
     void Start()
     {
+
+        DontDestroyOnLoad(gameObject);
+
         rb = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
     }
@@ -36,6 +39,14 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Player morreu!");
         // TODO: Implementar lógica de morte (restart, menu, etc)
         gameObject.SetActive(false);
+    }
+
+    public void IncreaseMaxHealth(int amount)
+    {
+        maxHealth += amount;
+        currentHealth += amount; // Também cura o valor aumentado
+        currentHealth = Mathf.Min(currentHealth, maxHealth);
+        Debug.Log($"❤️ Vida máxima aumentada em {amount}! Nova vida máxima: {maxHealth}");
     }
     
     public int GetCurrentHealth() => currentHealth;

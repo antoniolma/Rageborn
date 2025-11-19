@@ -5,165 +5,297 @@ using System.Collections.Generic;
 public class EnemySpawner : MonoBehaviour
 {
     [Header("Enemy Prefabs")]
-    [SerializeField] private GameObject[] enemyPrefabs;
+    [SerializeField] private List<GameObject> enemyPrefabs = new List<GameObject>();
     
-    [Header("Spawn Settings")]
-    [SerializeField] private int enemiesPerWave = 5;
-    [SerializeField] private float spawnDelay = 2f; // Delay entre spawns
-    [SerializeField] private float timeBetweenWaves = 10f; // Tempo entre ondas
+    [Header("Spawn Points")]
+    [SerializeField] private Transform[] spawnPoints;
+    [SerializeField] private bool useRandomSpawnInArea = false;
+    [SerializeField] private Vector2 spawnAreaMin = new Vector2(-10, -10);
+    [SerializeField] private Vector2 spawnAreaMax = new Vector2(10, 10);
     
-    [Header("Spawn Area")]
-    [SerializeField] private float spawnRadius = 10f; // Raio de spawn ao redor do spawner
-    [SerializeField] private Vector2 spawnAreaCenter; // Centro da área de spawn
-    [SerializeField] private bool useSpawnerPosition = true; // Usar posição deste GameObject
+    [Header("Wave Settings")]
+    [SerializeField] private int startingWaves = 3;
+    [SerializeField] private int baseEnemiesPerWave = 5;
+    [SerializeField] private float timeBetweenWaves = 5f;
+    [SerializeField] private float timeBetweenSpawns = 0.5f;
     
-    [Header("Wave Progression")]
-    [SerializeField] private bool increaseEnemiesPerWave = true;
-    [SerializeField] private int enemyIncreasePerWave = 2;
+    [Header("Difficulty Scaling")]
+    [SerializeField] private bool enableDifficultyScaling = true;
+    [SerializeField] private float enemyIncreasePerRoom = 1.5f; // +50% inimigos por room
+    [SerializeField] private float waveIncreasePerRoom = 0.5f; // +0.5 waves por room
     [SerializeField] private int maxEnemiesPerWave = 20;
+    [SerializeField] private int maxWaves = 8;
     
-    [Header("Debug")]
-    [SerializeField] private bool showSpawnArea = true;
-    [SerializeField] private Color gizmoColor = Color.red;
+    [Header("Shop Door")]
+    [SerializeField] private GameObject shopDoor;
+    [SerializeField] private string shopDoorName = "ShopDoorTrigger";
     
+    [Header("UI (Optional)")]
+    [SerializeField] private TMPro.TextMeshProUGUI waveText;
+    
+    // Runtime variables
     private int currentWave = 0;
+    private int totalWaves;
+    private int enemiesPerWave;
     private int enemiesAlive = 0;
+    private bool allWavesComplete = false;
     private bool isSpawning = false;
-    private List<GameObject> spawnedEnemies = new List<GameObject>();
+    
+    // Dificuldade progressiva
+    private int currentRoomNumber;
     
     void Start()
     {
-        if (useSpawnerPosition)
+        // Pega o número do room atual do RoomManager
+        if (RoomManager.Instance != null)
         {
-            spawnAreaCenter = transform.position;
+            currentRoomNumber = RoomManager.Instance.GetCurrentRoomNumber();
+        }
+        else
+        {
+            currentRoomNumber = 1; // Fallback
         }
         
-        if (enemyPrefabs.Length == 0)
+        // Calcula dificuldade baseada no room
+        CalculateDifficulty();
+        
+        // Encontra a porta da loja
+        FindShopDoor();
+        
+        // Valida configuração
+        if (enemyPrefabs.Count == 0)
         {
-            Debug.LogError("❌ Nenhum Enemy Prefab configurado no EnemySpawner!");
+            Debug.LogError("❌ Nenhum enemy prefab configurado no EnemySpawner!");
             return;
         }
         
-        Debug.Log("✅ EnemySpawner inicializado!");
-        StartCoroutine(SpawnWaves());
+        if (spawnPoints.Length == 0 && !useRandomSpawnInArea)
+        {
+            Debug.LogError("❌ Nenhum spawn point configurado e spawn aleatório desativado!");
+            return;
+        }
+        
+        // Inicia primeira wave após pequeno delay
+        StartCoroutine(StartFirstWaveDelayed());
+    }
+    
+    void CalculateDifficulty()
+    {
+        if (enableDifficultyScaling)
+        {
+            // Aumenta número de waves conforme progride
+            float waveMultiplier = 1 + ((currentRoomNumber - 1) * waveIncreasePerRoom);
+            totalWaves = Mathf.RoundToInt(startingWaves * waveMultiplier);
+            totalWaves = Mathf.Min(totalWaves, maxWaves);
+            
+            // Aumenta número de inimigos por wave
+            float enemyMultiplier = Mathf.Pow(enemyIncreasePerRoom, currentRoomNumber - 1);
+            enemiesPerWave = Mathf.RoundToInt(baseEnemiesPerWave * enemyMultiplier);
+            enemiesPerWave = Mathf.Min(enemiesPerWave, maxEnemiesPerWave);
+            
+            Debug.Log($"📊 Room {currentRoomNumber} - Dificuldade: {totalWaves} waves com {enemiesPerWave} inimigos cada");
+        }
+        else
+        {
+            totalWaves = startingWaves;
+            enemiesPerWave = baseEnemiesPerWave;
+        }
+    }
+    
+    void FindShopDoor()
+    {
+        if (shopDoor == null)
+        {
+            shopDoor = GameObject.Find(shopDoorName);
+            
+            if (shopDoor == null)
+            {
+                Debug.LogWarning($"⚠️ '{shopDoorName}' não encontrada! Porta não será ativada.");
+            }
+        }
+    }
+    
+    IEnumerator StartFirstWaveDelayed()
+    {
+        yield return new WaitForSeconds(2f);
+        StartNextWave();
     }
     
     void Update()
     {
-        // Remove inimigos mortos da lista
-        spawnedEnemies.RemoveAll(enemy => enemy == null);
-        enemiesAlive = spawnedEnemies.Count;
-    }
-    
-    private IEnumerator SpawnWaves()
-    {
-        while (true)
+        // Verifica se pode iniciar próxima wave
+        if (!isSpawning && enemiesAlive == 0 && currentWave < totalWaves && !allWavesComplete)
         {
-            currentWave++;
-            int enemiesToSpawn = CalculateEnemiesForWave();
-            
-            Debug.Log($"🌊 Onda {currentWave} começou! Inimigos: {enemiesToSpawn}");
-            
-            yield return StartCoroutine(SpawnWave(enemiesToSpawn));
-            
-            Debug.Log($"✅ Onda {currentWave} completa! Aguardando próxima onda...");
-            
-            // Aguarda até todos os inimigos morrerem ou tempo acabar
-            float waitTime = 0f;
-            while (enemiesAlive > 0 && waitTime < timeBetweenWaves)
-            {
-                waitTime += Time.deltaTime;
-                yield return null;
-            }
-            
-            // Tempo extra entre ondas
-            yield return new WaitForSeconds(3f);
+            StartCoroutine(StartNextWaveWithDelay());
+        }
+        
+        // Verifica se todas as waves terminaram
+        if (enemiesAlive == 0 && currentWave >= totalWaves && !allWavesComplete)
+        {
+            OnAllWavesComplete();
         }
     }
     
-    private IEnumerator SpawnWave(int enemyCount)
+    IEnumerator StartNextWaveWithDelay()
     {
         isSpawning = true;
         
-        for (int i = 0; i < enemyCount; i++)
+        if (currentWave > 0)
+        {
+            Debug.Log($"⏳ Próxima wave em {timeBetweenWaves} segundos...");
+            UpdateWaveUI($"Próxima wave em {timeBetweenWaves:F0}s");
+            yield return new WaitForSeconds(timeBetweenWaves);
+        }
+        
+        StartNextWave();
+    }
+    
+    void StartNextWave()
+    {
+        currentWave++;
+        Debug.Log($"📢 Wave {currentWave}/{totalWaves} começando! ({enemiesPerWave} inimigos)");
+        
+        UpdateWaveUI($"Wave {currentWave}/{totalWaves}");
+        
+        StartCoroutine(SpawnWave());
+    }
+    
+    IEnumerator SpawnWave()
+    {
+        isSpawning = true;
+        
+        for (int i = 0; i < enemiesPerWave; i++)
         {
             SpawnEnemy();
-            yield return new WaitForSeconds(spawnDelay);
+            yield return new WaitForSeconds(timeBetweenSpawns);
         }
         
         isSpawning = false;
     }
     
-    private void SpawnEnemy()
+    void SpawnEnemy()
     {
-        if (enemyPrefabs.Length == 0) return;
+        // Escolhe inimigo aleatório
+        GameObject enemyPrefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Count)];
         
-        // Escolhe um prefab aleatório
-        GameObject enemyPrefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
-        
-        // Calcula posição aleatória dentro do raio
-        Vector2 randomPosition = GetRandomSpawnPosition();
+        // Escolhe posição de spawn
+        Vector3 spawnPosition = GetSpawnPosition();
         
         // Spawna o inimigo
-        GameObject enemy = Instantiate(enemyPrefab, randomPosition, Quaternion.identity);
-        spawnedEnemies.Add(enemy);
+        GameObject enemy = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
         
-        Debug.Log($"👾 Enemy spawned em {randomPosition}");
-    }
-    
-    private Vector2 GetRandomSpawnPosition()
-    {
-        // Gera posição aleatória em um círculo
-        Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
-        return spawnAreaCenter + randomOffset;
-    }
-    
-    private int CalculateEnemiesForWave()
-    {
-        if (!increaseEnemiesPerWave)
+        // Registra listener para quando morrer
+        EnemyHealth enemyHealth = enemy.GetComponent<EnemyHealth>();
+        if (enemyHealth != null)
         {
-            return enemiesPerWave;
+            enemyHealth.OnDeath += OnEnemyDied;
+        }
+        else
+        {
+            // Fallback: procura outros componentes
+            Enemy enemyScript = enemy.GetComponent<Enemy>();
+            if (enemyScript != null)
+            {
+                // Você pode adicionar um evento OnDeath no seu script de Enemy
+                Debug.LogWarning("⚠️ Enemy não tem EnemyHealth component! Contador de inimigos pode não funcionar.");
+            }
         }
         
-        int enemies = enemiesPerWave + (enemyIncreasePerWave * (currentWave - 1));
-        return Mathf.Min(enemies, maxEnemiesPerWave);
+        enemiesAlive++;
     }
     
-    // Método público para spawnar um inimigo manualmente
-    public void SpawnEnemyManual()
+    Vector3 GetSpawnPosition()
     {
-        SpawnEnemy();
-    }
-    
-    // Método para pausar/retomar spawning
-    public void StopSpawning()
-    {
-        StopAllCoroutines();
-        isSpawning = false;
-        Debug.Log("⏸️ Spawning pausado!");
-    }
-    
-    public void ResumeSpawning()
-    {
-        if (!isSpawning)
+        if (useRandomSpawnInArea)
         {
-            StartCoroutine(SpawnWaves());
-            Debug.Log("▶️ Spawning retomado!");
+            // Spawn aleatório em área definida
+            float x = Random.Range(spawnAreaMin.x, spawnAreaMax.x);
+            float y = Random.Range(spawnAreaMin.y, spawnAreaMax.y);
+            return new Vector3(x, y, 0);
+        }
+        else
+        {
+            // Spawn em pontos pré-definidos
+            if (spawnPoints.Length > 0)
+            {
+                Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+                return spawnPoint.position;
+            }
+            else
+            {
+                Debug.LogWarning("⚠️ Nenhum spawn point disponível! Usando posição (0,0)");
+                return Vector3.zero;
+            }
         }
     }
     
-    // Getters
-    public int GetCurrentWave() => currentWave;
-    public int GetEnemiesAlive() => enemiesAlive;
-    public bool IsSpawning() => isSpawning;
-    
-    // Desenha a área de spawn no Editor
-    void OnDrawGizmos()
+    // Callback quando inimigo morre
+    public void OnEnemyDied()
     {
-        if (!showSpawnArea) return;
+        enemiesAlive--;
+        Debug.Log($"💀 Inimigo morreu! Restantes: {enemiesAlive}");
         
-        Gizmos.color = gizmoColor;
-        Vector2 center = useSpawnerPosition ? (Vector2)transform.position : spawnAreaCenter;
-        Gizmos.DrawWireSphere(center, spawnRadius);
+        // Atualiza UI
+        UpdateWaveUI($"Wave {currentWave}/{totalWaves} - {enemiesAlive} restantes");
+    }
+    
+    void OnAllWavesComplete()
+    {
+        allWavesComplete = true;
+        Debug.Log("✅ Todas as waves completas! Room limpa!");
+        
+        UpdateWaveUI("Room Limpa!");
+        
+        // ATIVA A PORTA DA LOJA
+        if (shopDoor != null)
+        {
+            shopDoor.SetActive(true);
+            Debug.Log("🚪 Porta da loja ativada!");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ ShopDoor não encontrada!");
+        }
+    }
+    
+    void UpdateWaveUI(string text)
+    {
+        if (waveText != null)
+        {
+            waveText.text = text;
+        }
+    }
+    
+    // Gizmos para visualizar spawn area
+    void OnDrawGizmosSelected()
+    {
+        if (useRandomSpawnInArea)
+        {
+            Gizmos.color = Color.yellow;
+            Vector3 center = new Vector3(
+                (spawnAreaMin.x + spawnAreaMax.x) / 2,
+                (spawnAreaMin.y + spawnAreaMax.y) / 2,
+                0
+            );
+            Vector3 size = new Vector3(
+                spawnAreaMax.x - spawnAreaMin.x,
+                spawnAreaMax.y - spawnAreaMin.y,
+                0
+            );
+            Gizmos.DrawWireCube(center, size);
+        }
+        
+        // Desenha spawn points
+        if (spawnPoints != null)
+        {
+            Gizmos.color = Color.red;
+            foreach (Transform point in spawnPoints)
+            {
+                if (point != null)
+                {
+                    Gizmos.DrawWireSphere(point.position, 0.5f);
+                }
+            }
+        }
     }
 }

@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 3
   tags:
   - Enemy
+  - PlayerSpawn
+  - Wall
   layers:
   - Default
   - TransparentFX
@@ -56,6 +58,9 @@ TagManager:
     locked: 0
   - name: Characters
     uniqueID: 3100787521
+    locked: 0
+  - name: Pickups
+    uniqueID: 2105181897
     locked: 0
   m_RenderingLayers:
   - Default

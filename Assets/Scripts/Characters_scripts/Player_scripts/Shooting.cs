@@ -1,9 +1,12 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Shooting : MonoBehaviour
 {
-    private Camera mainCam;
+    // Camera (pode ser atribuída no Inspector; se não, pega Camera.main)
+    [SerializeField] private Camera mainCam;
+
     private Vector3 mousePos;
     [SerializeField] private Transform swordTransform;
     [SerializeField] bool canFire;
@@ -18,10 +21,10 @@ public class Shooting : MonoBehaviour
     [SerializeField] private PlayerMovement playerMovement;
 
     // Objects Tiro
-    [SerializeField] private GameObject FireBullet; 
+    [SerializeField] private GameObject FireBullet;
     [SerializeField] private GameObject IceBullet;
     [SerializeField] private GameObject VenomBullet;
-    
+
     // Sprites Tiro
     private SpriteRenderer swordRenderer;
     [SerializeField] private Sprite fireSwordSprite;
@@ -37,38 +40,104 @@ public class Shooting : MonoBehaviour
 
     private Coroutine swingCoroutine;
 
+    void Awake()
+    {
+        // se não atribuída no Inspector, tenta pegar a câmera principal
+        if (mainCam == null)
+            mainCam = Camera.main;
+    }
+
+    void OnEnable()
+    {
+        // quando uma cena carrega, a câmera pode mudar — reatribui se necessário
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // reatribui Camera.main quando a cena muda (se a câmera atual foi destruída)
+        if (mainCam == null)
+            mainCam = Camera.main;
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        // Camera (para rotacao)
-        mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        // Camera (se ainda nulo)
+        if (mainCam == null)
+            mainCam = Camera.main;
 
-        // Player
+        // Player (pode estar na cena; verifica nulo)
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        playerRnd = player.GetComponent<SpriteRenderer>();
-        playerMovement = player.GetComponent<PlayerMovement>();
+        if (player != null)
+        {
+            playerRnd = player.GetComponent<SpriteRenderer>();
+            if (playerMovement == null)
+                playerMovement = player.GetComponent<PlayerMovement>();
+        }
+        else
+        {
+            Debug.LogWarning("[Shooting] Player não encontrado com Tag 'Player' na cena.");
+        }
 
-        // Espada
-        sword = transform.Find("SwordTransform");
-        swordRenderer = sword.GetComponent<SpriteRenderer>();
-        swordRenderer.sortingLayerName = playerRnd.sortingLayerName;
-        swordRenderer.sortingOrder = playerRnd.sortingOrder;
+        // Espada (procura child)
+        if (swordTransform == null)
+        {
+            // tenta encontrar um filho chamado "SwordTransform"
+            Transform found = transform.Find("SwordTransform");
+            if (found != null)
+                swordTransform = found;
+        }
+
+        sword = swordTransform;
+        if (sword != null)
+        {
+            swordRenderer = sword.GetComponent<SpriteRenderer>();
+            if (swordRenderer != null && playerRnd != null)
+            {
+                swordRenderer.sortingLayerName = playerRnd.sortingLayerName;
+                swordRenderer.sortingOrder = playerRnd.sortingOrder;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[Shooting] swordTransform não atribuído / não encontrado. Swing e tiros podem não funcionar.");
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
+        // tenta reatribuir a câmera se ela tiver sido destruída
+        if (mainCam == null)
+            mainCam = Camera.main;
 
-        // transform.pos serve como offset, para saber qual longe do centro
+        // se ainda não há câmera, abranda e evita usar ScreenToWorldPoint
+        if (mainCam == null)
+        {
+            // sem câmera disponível — não processa mira/tiro nesse frame
+            return;
+        }
+
+        // usa a profundidade da camera para ScreenToWorldPoint (evita z=0 errado)
+        Vector3 mouseScreen = Input.mousePosition;
+        mouseScreen.z = Mathf.Max(0.01f, mainCam.nearClipPlane + 0.01f);
+        mousePos = mainCam.ScreenToWorldPoint(mouseScreen);
+
+        // protege transform/position se este objeto tiver sido movido
         Vector3 rotation = mousePos - transform.position;
         float rotZ = Mathf.Atan2(rotation.y, rotation.x) * Mathf.Rad2Deg;
-
         transform.rotation = Quaternion.Euler(0, 0, rotZ);
 
-        // Verifica qual TypeSword do Player
-        int TypeSword = playerMovement.TypeSword;
-        Debug.Log(TypeSword);
+        // Verifica qual TypeSword do Player (protege nulo)
+        int TypeSword = 0;
+        if (playerMovement != null)
+            TypeSword = playerMovement.TypeSword;
 
         // Atirar
         if (Input.GetButton("Fire1") && canFire)
@@ -83,7 +152,7 @@ public class Shooting : MonoBehaviour
             fireTime = 0;
         }
 
-        // Atualiza o Sprite da espada
+        // Atualiza o Sprite da espada (checa nulo)
         UpdateSwordSprite();
     }
 
@@ -92,6 +161,12 @@ public class Shooting : MonoBehaviour
 
     void Shoot(int TypeSword)
     {
+        if (swordTransform == null)
+        {
+            Debug.LogWarning("[Shooting] Não é possível atirar: swordTransform é nulo.");
+            return;
+        }
+
         canFire = false;
         fireTime = Time.time;
 
@@ -99,32 +174,50 @@ public class Shooting : MonoBehaviour
         if (TypeSword == 0)
         {
             // Fire
-            GameObject Bullet = Instantiate(FireBullet, swordTransform.position, Quaternion.identity);
-            Bullet.transform.rotation = sword.transform.rotation;
-            Bullet.GetComponent<SpriteRenderer>().sortingLayerName = swordRenderer.sortingLayerName;
-            Bullet.GetComponent<SpriteRenderer>().sortingOrder = swordRenderer.sortingOrder + 1;
-            Destroy(Bullet, 3);
-            // Debug.Log("Fire!");
+            if (FireBullet != null)
+            {
+                GameObject Bullet = Instantiate(FireBullet, swordTransform.position, Quaternion.identity);
+                Bullet.transform.rotation = sword.transform.rotation;
+                var sr = Bullet.GetComponent<SpriteRenderer>();
+                if (sr != null)
+                {
+                    sr.sortingLayerName = swordRenderer != null ? swordRenderer.sortingLayerName : "Default";
+                    sr.sortingOrder = swordRenderer != null ? swordRenderer.sortingOrder + 1 : 0;
+                }
+                Destroy(Bullet, 3);
+            }
         }
         else if (TypeSword == 1)
         {
             // Ice
-            GameObject Bullet = Instantiate(IceBullet, swordTransform.position, Quaternion.identity);
-            Bullet.transform.rotation = sword.transform.rotation;
-            Bullet.GetComponent<SpriteRenderer>().sortingLayerName = swordRenderer.sortingLayerName;
-            Bullet.GetComponent<SpriteRenderer>().sortingOrder = swordRenderer.sortingOrder + 1;
-            Destroy(Bullet, 3);
-            // Debug.Log("Ice!");
+            if (IceBullet != null)
+            {
+                GameObject Bullet = Instantiate(IceBullet, swordTransform.position, Quaternion.identity);
+                Bullet.transform.rotation = sword.transform.rotation;
+                var sr = Bullet.GetComponent<SpriteRenderer>();
+                if (sr != null)
+                {
+                    sr.sortingLayerName = swordRenderer != null ? swordRenderer.sortingLayerName : "Default";
+                    sr.sortingOrder = swordRenderer != null ? swordRenderer.sortingOrder + 1 : 0;
+                }
+                Destroy(Bullet, 3);
+            }
         }
         else if (TypeSword == 2)
         {
             // Venom
-            GameObject Bullet = Instantiate(VenomBullet, swordTransform.position, Quaternion.identity);
-            Bullet.transform.rotation = sword.transform.rotation;
-            Bullet.GetComponent<SpriteRenderer>().sortingLayerName = swordRenderer.sortingLayerName;
-            Bullet.GetComponent<SpriteRenderer>().sortingOrder = swordRenderer.sortingOrder + 1;
-            Destroy(Bullet, 3);
-            // Debug.Log("Venom!");
+            if (VenomBullet != null)
+            {
+                GameObject Bullet = Instantiate(VenomBullet, swordTransform.position, Quaternion.identity);
+                Bullet.transform.rotation = sword.transform.rotation;
+                var sr = Bullet.GetComponent<SpriteRenderer>();
+                if (sr != null)
+                {
+                    sr.sortingLayerName = swordRenderer != null ? swordRenderer.sortingLayerName : "Default";
+                    sr.sortingOrder = swordRenderer != null ? swordRenderer.sortingOrder + 1 : 0;
+                }
+                Destroy(Bullet, 3);
+            }
         }
     }
 
@@ -132,6 +225,8 @@ public class Shooting : MonoBehaviour
     // Sprite da Espada
     void UpdateSwordSprite()
     {
+        if (swordRenderer == null || playerMovement == null) return;
+
         // Fogo
         if (playerMovement.TypeSword == 0) { swordRenderer.sprite = fireSwordSprite; }
         // Ice
@@ -163,6 +258,12 @@ public class Shooting : MonoBehaviour
 
     IEnumerator SwingCoroutine(float angleDelta, float forwardTime, float backTime)
     {
+        if (swordTransform == null)
+        {
+            swingCoroutine = null;
+            yield break;
+        }
+
         float startZ = NormalizeAngle(swordTransform.localEulerAngles.z);
         float targetZ = startZ - angleDelta;
 
@@ -209,6 +310,4 @@ public class Shooting : MonoBehaviour
         a = Mathf.Repeat(a + 180f, 360f) - 180f;
         return a;
     }
-
-
 }

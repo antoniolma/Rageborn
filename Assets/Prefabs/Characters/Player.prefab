@@ -345,6 +345,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 250472643709776223}
+  - component: {fileID: 1330803371260633394}
   m_Layer: 0
   m_Name: RotatePoint
   m_TagString: Untagged
@@ -368,3 +369,25 @@ Transform:
   - {fileID: 2489070070137778346}
   m_Father: {fileID: 7916472914964482766}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1330803371260633394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6342405740583442257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7eca4f05f40e949948f77b6ffe00d8c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  swordTransform: {fileID: 2489070070137778346}
+  canFire: 1
+  cooldown: 0.5
+  playerMovement: {fileID: 8883294100328716605}
+  FireBullet: {fileID: 5245835475474909516, guid: ef9c9e19d14f71a1fa8d07227cd5982b, type: 3}
+  IceBullet: {fileID: 5245835475474909516, guid: 9408b26076979674988fde04bdad646f, type: 3}
+  VenomBullet: {fileID: 5245835475474909516, guid: 61389f4977c67c54381e315e8c35bc79, type: 3}
+  fireSwordSprite: {fileID: -2065207136, guid: 58aa786af7d036c4bbcddfaeca9e649a, type: 3}
+  iceSwordSprite: {fileID: 1753369541, guid: 5db9b4d51eaa6794c9a4c20969c0815b, type: 3}
+  venomSwordSprite: {fileID: 1330965007, guid: df6696df7563e004bb4e24484af1f2b7, type: 3}

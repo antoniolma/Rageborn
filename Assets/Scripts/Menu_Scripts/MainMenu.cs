@@ -28,10 +28,22 @@ public class MainMenu : MonoBehaviour
 
     #region Navegação Principal
     
-    // Botão "Jogar"
+    // ✅ ATUALIZADO - Botão "Jogar" agora usa RoomManager
     public void IniciarJogo()
     {
-        SceneManager.LoadScene("Arena_Inferno");
+        Debug.Log("🎮 Iniciando jogo...");
+        
+        // Usa o RoomManager para iniciar o jogo
+        if (RoomManager.Instance != null)
+        {
+            RoomManager.Instance.StartGame();
+        }
+        else
+        {
+            Debug.LogError("❌ RoomManager não encontrado! Certifique-se que está na cena MainMenu.");
+            // Fallback: carrega a primeira room diretamente
+            SceneManager.LoadScene("Area_inicial");
+        }
     }
 
     // Botão "Opções"
