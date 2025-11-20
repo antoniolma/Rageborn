@@ -12,11 +12,9 @@ GameObject:
   - component: {fileID: 35656754318024113}
   - component: {fileID: 4314655980107785765}
   - component: {fileID: 806232205208313513}
-  - component: {fileID: 8886565686659111657}
   - component: {fileID: 8547225381580360681}
   - component: {fileID: 3259817318849160926}
   - component: {fileID: 6470882004172348633}
-  - component: {fileID: 1628356271946131874}
   - component: {fileID: 2950651377303943432}
   - component: {fileID: 1758028314075809567}
   - component: {fileID: 3684796984236580746}
@@ -142,26 +140,6 @@ NavMeshAgent:
   m_BaseOffset: 2
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &8886565686659111657
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 543489640859766967}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 09b33ab418566b570a2725ae58ee0fee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 50
-  damage: 10
-  moveSpeed: 2
-  attackRange: 2
-  attackCooldown: 1
-  flipSpriteBasedOnDirection: 1
-  healthBarCanvas: {fileID: 0}
-  attackSound: {fileID: 0}
 --- !u!50 &8547225381580360681
 Rigidbody2D:
   serializedVersion: 5
@@ -260,26 +238,6 @@ MonoBehaviour:
   flashColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.1
   numberOfFlashes: 2
---- !u!114 &1628356271946131874
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 543489640859766967}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 09b33ab418566b570a2725ae58ee0fee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 50
-  damage: 10
-  moveSpeed: 2
-  attackRange: 1.5
-  attackCooldown: 1
-  flipSpriteBasedOnDirection: 1
-  healthBarCanvas: {fileID: 0}
-  attackSound: {fileID: 0}
 --- !u!114 &2950651377303943432
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7328350425798044873}
   - component: {fileID: 119743397181619492}
   - component: {fileID: 6014291395707984185}
-  - component: {fileID: 211861973178658416}
   - component: {fileID: 7387961398365395828}
   - component: {fileID: 2167142890026656282}
   - component: {fileID: 1035515013230522341}
@@ -123,26 +122,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &211861973178658416
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6029624961295860769}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 09b33ab418566b570a2725ae58ee0fee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 50
-  damage: 10
-  moveSpeed: 2
-  attackRange: 1.5
-  attackCooldown: 1
-  flipSpriteBasedOnDirection: 1
-  healthBarCanvas: {fileID: 0}
-  attackSound: {fileID: 0}
 --- !u!195 &7387961398365395828
 NavMeshAgent:
   m_ObjectHideFlags: 0

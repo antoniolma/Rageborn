@@ -12,12 +12,13 @@ GameObject:
   - component: {fileID: 463129704846963285}
   - component: {fileID: 5490522525622309271}
   - component: {fileID: 5660565744113584659}
-  - component: {fileID: 8883294100328716605}
   - component: {fileID: 7554011014191377525}
-  - component: {fileID: 1792333064198602065}
   - component: {fileID: 2798929145489673115}
-  - component: {fileID: 4784532567807022474}
   - component: {fileID: 3934120016447759375}
+  - component: {fileID: 7614662672661674045}
+  - component: {fileID: 4719352395281743893}
+  - component: {fileID: 1784093990636179302}
+  - component: {fileID: 4374040640363611597}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -169,22 +170,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.1, y: 0.2}
   m_EdgeRadius: 0
---- !u!114 &8883294100328716605
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 295012727168760991}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d508ec5093c4ce42941122a841029f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _animator: {fileID: 7554011014191377525}
-  spriteRenderer: {fileID: 463129704846963285}
-  speed: 12
-  TypeSword: 0
 --- !u!95 &7554011014191377525
 Animator:
   serializedVersion: 7
@@ -207,19 +192,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1792333064198602065
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 295012727168760991}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0773ddcb707d18a758f6d3301ed20da6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 100
 --- !u!114 &2798929145489673115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -235,21 +207,6 @@ MonoBehaviour:
   flashColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.1
   numberOfFlashes: 2
---- !u!114 &4784532567807022474
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 295012727168760991}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1bb23f991cf4ca4d8ca5f427534a77d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  offset: {x: 0, y: 0}
-  shadowMaterial: {fileID: 0}
-  shadowColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &3934120016447759375
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -263,6 +220,65 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startingCoins: 0
+--- !u!114 &7614662672661674045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 295012727168760991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1bb23f991cf4ca4d8ca5f427534a77d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: {x: 0, y: -0.5}
+  shadowMaterial: {fileID: 2100000, guid: 3b716dd4ada282a4cbd0e51875b903b9, type: 2}
+  shadowColor: {r: 0, g: 0, b: 0, a: 0}
+--- !u!114 &4719352395281743893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 295012727168760991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72732b4cc35f253a5af7d6d6b2eea2d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseDamage: 10
+  baseSpeed: 15
+  baseAttackSpeed: 1
+--- !u!114 &1784093990636179302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 295012727168760991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 487c414d7a1e9bf4ba25967047e13ade, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 7554011014191377525}
+  spriteRenderer: {fileID: 463129704846963285}
+  speed: 2
+  TypeSword: 0
+--- !u!114 &4374040640363611597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 295012727168760991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e228af6af4665d54592d47e1821019d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
 --- !u!1 &2576776722306249422
 GameObject:
   m_ObjectHideFlags: 0
@@ -399,7 +415,7 @@ MonoBehaviour:
   swordTransform: {fileID: 2489070070137778346}
   canFire: 1
   cooldown: 0.5
-  playerMovement: {fileID: 8883294100328716605}
+  playerMovement: {fileID: 1784093990636179302}
   FireBullet: {fileID: 5245835475474909516, guid: ef9c9e19d14f71a1fa8d07227cd5982b, type: 3}
   IceBullet: {fileID: 5245835475474909516, guid: 9408b26076979674988fde04bdad646f, type: 3}
   VenomBullet: {fileID: 5245835475474909516, guid: 61389f4977c67c54381e315e8c35bc79, type: 3}

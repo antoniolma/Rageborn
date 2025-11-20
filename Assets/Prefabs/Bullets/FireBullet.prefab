@@ -100,10 +100,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 5245835475474909516}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9724f817e4033c14a94b10fb1e3bd1cd, type: 3}
+  m_Script: {fileID: 11500000, guid: 2e31e35d0d9a79d4ca06dfcf094a91d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   force: 20
+  damage: 10
+  lifetime: 5
+  hitEffectPrefab: {fileID: 0}
 --- !u!50 &6897865838228683031
 Rigidbody2D:
   serializedVersion: 5
