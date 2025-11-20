@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 1628356271946131874}
   - component: {fileID: 2950651377303943432}
   - component: {fileID: 1758028314075809567}
+  - component: {fileID: 3684796984236580746}
   m_Layer: 0
   m_Name: Goblin
   m_TagString: Enemy
@@ -328,6 +329,21 @@ MonoBehaviour:
   dashDuration: 0.4
   dashRange: 6
   dashTrail: {fileID: 0}
+--- !u!114 &3684796984236580746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543489640859766967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2370f6aeb7b229aabb263a5fd9835267, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coinDropData: {fileID: 11400000, guid: 1ee06018549ac6bb78c0dbdb3c151ac8, type: 2}
+  guaranteedDrop: 1
+  dropChance: 100
 --- !u!1001 &953624602135174293
 PrefabInstance:
   m_ObjectHideFlags: 0

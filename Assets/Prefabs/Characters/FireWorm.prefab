@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 1035515013230522341}
   - component: {fileID: 4116775970565117016}
   - component: {fileID: 6132611745052040587}
+  - component: {fileID: 4199993792412786069}
   m_Layer: 0
   m_Name: FireWorm
   m_TagString: Enemy
@@ -291,6 +292,21 @@ MonoBehaviour:
   shakeOnDeath: 1
   shakeIntensity: 0.3
   shakeDuration: 0.2
+--- !u!114 &4199993792412786069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6029624961295860769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2370f6aeb7b229aabb263a5fd9835267, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coinDropData: {fileID: 11400000, guid: 1ee06018549ac6bb78c0dbdb3c151ac8, type: 2}
+  guaranteedDrop: 1
+  dropChance: 100
 --- !u!1001 &9007463882845302853
 PrefabInstance:
   m_ObjectHideFlags: 0

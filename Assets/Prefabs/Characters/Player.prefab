@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 1792333064198602065}
   - component: {fileID: 2798929145489673115}
   - component: {fileID: 4784532567807022474}
+  - component: {fileID: 3934120016447759375}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -249,6 +250,19 @@ MonoBehaviour:
   offset: {x: 0, y: 0}
   shadowMaterial: {fileID: 0}
   shadowColor: {r: 0, g: 0, b: 0, a: 0}
+--- !u!114 &3934120016447759375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 295012727168760991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 389ee8feb23f86545bb0500c449d4235, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startingCoins: 0
 --- !u!1 &2576776722306249422
 GameObject:
   m_ObjectHideFlags: 0
@@ -381,6 +395,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7eca4f05f40e949948f77b6ffe00d8c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainCam: {fileID: 0}
   swordTransform: {fileID: 2489070070137778346}
   canFire: 1
   cooldown: 0.5
