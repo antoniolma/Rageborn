@@ -417,8 +417,8 @@ MonoBehaviour:
   cooldown: 0.5
   playerMovement: {fileID: 1784093990636179302}
   FireBullet: {fileID: 5245835475474909516, guid: ef9c9e19d14f71a1fa8d07227cd5982b, type: 3}
-  IceBullet: {fileID: 5245835475474909516, guid: 9408b26076979674988fde04bdad646f, type: 3}
-  VenomBullet: {fileID: 5245835475474909516, guid: 61389f4977c67c54381e315e8c35bc79, type: 3}
+  IceBullet: {fileID: 5245835475474909516, guid: 06a46db310444e14bb2cac93c2b63169, type: 3}
+  VenomBullet: {fileID: 5245835475474909516, guid: df639d91b155c6f4fa51ff6d631d7923, type: 3}
   fireSwordSprite: {fileID: -2065207136, guid: 58aa786af7d036c4bbcddfaeca9e649a, type: 3}
   iceSwordSprite: {fileID: 1753369541, guid: 5db9b4d51eaa6794c9a4c20969c0815b, type: 3}
   venomSwordSprite: {fileID: 1330965007, guid: df6696df7563e004bb4e24484af1f2b7, type: 3}
