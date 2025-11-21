@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc25a4788ec649745ae15ea47bd0fc27, type: 3}
   m_Name: DamageBoost
   m_EditorClassIdentifier: 
-  itemName: 
-  description: 
-  itemSprite: {fileID: 0}
+  itemName: "Anel do \xD3dio"
+  description: Aumenta o dano geral
+  itemSprite: {fileID: 4077231759469409287, guid: ca9412fc55b9ed78b98f746e2cb7c6eb, type: 3}
   price: 15
   itemType: 1
   value: 5
-  itemPrefab: {fileID: 0}
+  itemPrefab: {fileID: 6307555995846362847, guid: c19350e99d8a829058ff7f0a61f959b4, type: 3}

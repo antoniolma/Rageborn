@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc25a4788ec649745ae15ea47bd0fc27, type: 3}
   m_Name: AttackSpeedBoost
   m_EditorClassIdentifier: 
-  itemName: 
-  description: Restaura 10 pontos de vida
-  itemSprite: {fileID: 0}
+  itemName: Anel da Raiva
+  description: Aumenta a velocidade de ataque
+  itemSprite: {fileID: 341158593689259082, guid: 2c6fae7bfcbd2fe0196539f892c381b8, type: 3}
   price: 10
   itemType: 4
   value: 10
-  itemPrefab: {fileID: 0}
+  itemPrefab: {fileID: 6307555995846362847, guid: c19350e99d8a829058ff7f0a61f959b4, type: 3}

@@ -32,10 +32,11 @@ public class GenericShopItem : InteractableItem
     
     void ApplyItemEffect()
     {
+        if (player == null) return;
+        
         switch (itemType)
         {
             case ShopItemType.HealthPotion:
-                // ✅ CORRIGIDO - usa PlayerController ao invés de PlayerHealth
                 PlayerController playerController = player.GetComponent<PlayerController>();
                 if (playerController != null)
                 {
@@ -48,31 +49,33 @@ public class GenericShopItem : InteractableItem
                 if (PlayerStats.Instance != null)
                 {
                     PlayerStats.Instance.IncreaseDamage(itemValue);
+                    Debug.Log($"⚔️ Dano aumentado em {itemValue}!");
                 }
                 break;
                 
             case ShopItemType.SpeedBoost:
                 if (PlayerStats.Instance != null)
                 {
-                    // ✅ Converte int para float
-                    PlayerStats.Instance.IncreaseSpeed((float)itemValue);
+                    float speedIncrease = (float)itemValue / 10f;
+                    PlayerStats.Instance.IncreaseSpeed(speedIncrease);
+                    Debug.Log($"🏃 Velocidade aumentada em {speedIncrease}!");
                 }
                 break;
                 
             case ShopItemType.MaxHealthIncrease:
-                // ✅ CORRIGIDO - usa PlayerController
                 PlayerController controller = player.GetComponent<PlayerController>();
                 if (controller != null)
                 {
                     controller.IncreaseMaxHealth(itemValue);
+                    Debug.Log($"❤️ Vida máxima aumentada em {itemValue}!");
                 }
                 break;
                 
             case ShopItemType.AttackSpeedBoost:
                 if (PlayerStats.Instance != null)
                 {
-                    // ✅ Converte int para float
                     PlayerStats.Instance.IncreaseAttackSpeed((float)itemValue);
+                    Debug.Log($"⚡ Velocidade de ataque aumentada em {itemValue}!");
                 }
                 break;
         }

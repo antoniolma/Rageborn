@@ -17,6 +17,7 @@ public class InteractableItem : MonoBehaviour
     [Header("UI References")]
     [SerializeField] protected GameObject interactionPrompt;
     [SerializeField] protected TextMeshProUGUI promptText;
+    [SerializeField] protected GameObject itemInfoCanvas;
     [SerializeField] protected TextMeshProUGUI itemNameText;
     [SerializeField] protected TextMeshProUGUI itemDescriptionText;
     
@@ -36,6 +37,9 @@ public class InteractableItem : MonoBehaviour
         if (interactionPrompt != null)
             interactionPrompt.SetActive(false);
             
+        if (itemInfoCanvas != null)
+            itemInfoCanvas.SetActive(false);
+            
         UpdatePromptText();
     }
     
@@ -44,10 +48,15 @@ public class InteractableItem : MonoBehaviour
         if (player == null || isPurchased) return;
         
         float distance = Vector2.Distance(transform.position, player.position);
+        bool wasInRange = playerInRange;
         playerInRange = distance <= interactionRange;
         
-        if (interactionPrompt != null)
-            interactionPrompt.SetActive(playerInRange);
+        // ✅ Atualiza UI quando o player entra ou sai do range
+        if (playerInRange != wasInRange)
+        {
+            ShowInteractionPrompt(playerInRange);
+            ShowItemInfo(playerInRange);
+        }
         
         if (playerInRange && Input.GetKeyDown(interactKey))
         {
@@ -64,9 +73,22 @@ public class InteractableItem : MonoBehaviour
         itemValue = data.value;
         
         // Atualiza o sprite do item
+        if (itemSpriteRenderer == null)
+        {
+            itemSpriteRenderer = GetComponent<SpriteRenderer>();
+            if (itemSpriteRenderer == null)
+                itemSpriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        }
+        
+        // Atualiza o sprite do item
         if (itemSpriteRenderer != null && data.itemSprite != null)
         {
             itemSpriteRenderer.sprite = data.itemSprite;
+            Debug.Log($"✅ Sprite atribuído: {data.itemSprite.name}");
+        }
+        else
+        {
+            Debug.LogWarning($"❌ Sprite não atribuído! SpriteRenderer: {itemSpriteRenderer != null}, Sprite: {data.itemSprite != null}");
         }
         
         UpdatePromptText();
@@ -92,13 +114,27 @@ public class InteractableItem : MonoBehaviour
     protected virtual void OnPurchaseSuccess()
     {
         isPurchased = true;
-        if (interactionPrompt != null)
-            interactionPrompt.SetActive(false);
+        ShowInteractionPrompt(false);
+        ShowItemInfo(false);
     }
     
     protected virtual void OnPurchaseFailed()
     {
         Debug.Log("❌ Moedas insuficientes!");
+    }
+    
+    // ✅ NOVO MÉTODO - Mostra/esconde o prompt de interação
+    protected virtual void ShowInteractionPrompt(bool show)
+    {
+        if (interactionPrompt != null)
+            interactionPrompt.SetActive(show);
+    }
+    
+    // ✅ NOVO MÉTODO - Mostra/esconde a caixinha de informações
+    protected virtual void ShowItemInfo(bool show)
+    {
+        if (itemInfoCanvas != null)
+            itemInfoCanvas.SetActive(show);
     }
     
     protected virtual void UpdatePromptText()

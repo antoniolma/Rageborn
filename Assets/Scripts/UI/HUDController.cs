@@ -9,13 +9,13 @@ public class HUDController : MonoBehaviour
     [SerializeField] private float healthLerpSpeed = 8f;
 
     [Header("Coins")]
-    [SerializeField] private TMPro.TMP_Text coinsText; // ou TMPro.TMP_Text se usar TextMeshPro
+    [SerializeField] private TMPro.TMP_Text coinsText;
 
     // internals
     private float displayedHealthFraction = 1f;
     private float targetHealthFraction = 1f;
 
-    private PlayerController player; // pega referências do Player (PlayerController). :contentReference[oaicite:1]{index=1}
+    private PlayerController player;
 
     void Awake()
     {
@@ -25,28 +25,27 @@ public class HUDController : MonoBehaviour
 
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        // inicializa
-        healthSlider.maxValue = player.GetMaxHealth();
-        healthSlider.value = player.GetCurrentHealth();
+        player = GameObject.FindGameObjectWithTag("Player")?.GetComponent<PlayerController>();
+        
+        if (player != null)
+        {
+            // inicializa health
+            healthSlider.maxValue = player.GetMaxHealth();
+            healthSlider.value = player.GetCurrentHealth();
+        }
 
-        // subscreve eventos de moeda
-        PlayerCurrency.OnCoinsChanged += OnCoinsChanged;
-        // atualiza texto inicial
-        coinsText.text = PlayerCurrency.Instance != null ? PlayerCurrency.Instance.GetCoins().ToString() : "0";
-    }
-
-    void OnDestroy()
-    {
-        PlayerCurrency.OnCoinsChanged -= OnCoinsChanged;
+        // ✅ Atualiza texto inicial de moedas
+        UpdateCoinsDisplay();
     }
 
     void Update()
     {
-        // atualiza target health se houver player
+        // atualiza health
         if (player != null)
             healthSlider.value = player.GetCurrentHealth();
 
+        // ✅ Atualiza moedas todo frame (ou você pode usar eventos se preferir)
+        UpdateCoinsDisplay();
     }
 
     private void UpdateTargetHealthFromPlayer()
@@ -58,15 +57,19 @@ public class HUDController : MonoBehaviour
         targetHealthFraction = Mathf.Clamp01((float)cur / (float)max);
     }
 
-    private void OnCoinsChanged(int newValue)
+    // ✅ NOVO - Atualiza display de moedas usando CurrencyManager
+    private void UpdateCoinsDisplay()
     {
-        if (coinsText != null)
-            coinsText.text = newValue.ToString();
+        if (coinsText != null && CurrencyManager.Instance != null)
+        {
+            coinsText.text = CurrencyManager.Instance.GetRunCoins().ToString();
+        }
     }
 
     // API pública (útil para testes / chamadas diretas)
     public void ForceUpdateCoins(int coins)
     {
-        if (coinsText != null) coinsText.text = coins.ToString();
+        if (coinsText != null) 
+            coinsText.text = coins.ToString();
     }
 }

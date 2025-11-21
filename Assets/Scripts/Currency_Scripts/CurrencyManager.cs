@@ -6,6 +6,7 @@ public class CurrencyManager : MonoBehaviour
     public static CurrencyManager Instance;
     
     [Header("Currency")]
+    [SerializeField] private int startingRunCoins = 100;
     private int runCoins = 0; // Moedas temporárias da run
     private int metaCoins = 0; // Moedas permanentes (para metaprogression)
     
@@ -29,6 +30,7 @@ public class CurrencyManager : MonoBehaviour
     
     void Start()
     {
+        runCoins = startingRunCoins; 
         UpdateUI();
     }
     

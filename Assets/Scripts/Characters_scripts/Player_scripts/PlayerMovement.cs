@@ -6,7 +6,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Animator _animator;
     [SerializeField] private SpriteRenderer spriteRenderer;
 
-    public float speed;
+    private float speed;
 
     // 0 = Fire, 1 = Ice, 2 = Elec
     public int TypeSword;
@@ -14,10 +14,21 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        
+        // ✅ Inicializa velocidade do PlayerStats
+        if (PlayerStats.Instance != null)
+        {
+            speed = PlayerStats.Instance.GetTotalSpeed();
+        }
     }
 
     void FixedUpdate()
     {
+        if (PlayerStats.Instance != null)
+        {
+            speed = PlayerStats.Instance.GetTotalSpeed();
+        }
+        
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
         float moveVertical = Input.GetAxisRaw("Vertical");
 
@@ -37,14 +48,9 @@ public class PlayerMovement : MonoBehaviour
         _animator.SetFloat("InputY", moveVertical);
     }
 
-    // ✅ CORRIGIDO - agora usa 'speed' ao invés de 'moveSpeed'
     public void UpdateSpeed(float newSpeed)
     {
         speed = newSpeed;
     }
 
-    public void IncreaseSpeed(float amount)
-    {
-        speed += amount;
-    }
 }

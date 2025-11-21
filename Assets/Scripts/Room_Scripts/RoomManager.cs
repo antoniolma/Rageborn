@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
@@ -12,10 +11,11 @@ public class RoomManager : MonoBehaviour
     [Header("Room Scenes")]
     [SerializeField] private List<string> normalRoomScenes = new List<string>();
     [SerializeField] private string shopRoomScene = "ShopRoom";
-    [SerializeField] private string bossRoomScene = ""; // ✅ Pode ficar vazio
+    [SerializeField] private string bossRoomScene = "BossRoom";
 
     [Header("Room Flow Settings")]
-    [SerializeField] private int roomsBeforeShop = 2;
+    [SerializeField] private int timesEachRoomAppears = 2; // Cada room aparece 2x
+    [SerializeField] private int totalShopsBeforeBoss = 4; // Quantos shops antes do boss
 
     [Header("Player Persistence")]
     [SerializeField] private Vector2 playerSpawnOffset = new Vector2(5, 5);
@@ -49,7 +49,6 @@ public class RoomManager : MonoBehaviour
     void Start()
     {
         GenerateRoomSequence();
-        // ✅ NÃO carrega automaticamente - espera o botão iniciar
     }
 
     void GenerateRoomSequence()
@@ -63,41 +62,65 @@ public class RoomManager : MonoBehaviour
             return;
         }
 
-        // Cria lista com todas as rooms disponíveis
-        List<string> availableRooms = new List<string>(normalRoomScenes);
-
-        // Embaralha
-        ShuffleList(availableRooms);
-
-        // Monta a sequência: Room → Room → Shop → Room → Room → Shop... (→ Boss opcional)
-        for (int i = 0; i < availableRooms.Count; i++)
+        // ✅ Cria lista com cada room repetida X vezes
+        List<string> allRooms = new List<string>();
+        
+        foreach (string roomScene in normalRoomScenes)
         {
-            roomSequence.Add(availableRooms[i]);
-
-            // A cada X rooms, adiciona um shop (se existir)
-            if ((i + 1) % roomsBeforeShop == 0 && i < availableRooms.Count - 1)
+            for (int i = 0; i < timesEachRoomAppears; i++)
             {
-                if (!string.IsNullOrEmpty(shopRoomScene))
-                {
-                    roomSequence.Add(shopRoomScene);
-                }
+                allRooms.Add(roomScene);
             }
         }
 
-        // Adiciona o boss no final (se existir)
+        // Embaralha todas as rooms
+        ShuffleList(allRooms);
+
+        // ✅ NOVO - Padrão: Room → Shop → Room → Shop → ... (até ter X shops)
+        int shopsAdded = 0;
+        
+        for (int i = 0; i < allRooms.Count && shopsAdded < totalShopsBeforeBoss; i++)
+        {
+            // Adiciona a room normal
+            roomSequence.Add(allRooms[i]);
+            
+            // Adiciona shop depois de cada room (se ainda não atingiu o limite)
+            if (shopsAdded < totalShopsBeforeBoss && !string.IsNullOrEmpty(shopRoomScene))
+            {
+                roomSequence.Add(shopRoomScene);
+                shopsAdded++;
+            }
+        }
+
+        // ✅ Adiciona o boss no final
         if (!string.IsNullOrEmpty(bossRoomScene))
         {
             roomSequence.Add(bossRoomScene);
+            Debug.Log("🐉 Boss room adicionada ao final da sequência!");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ Boss room scene não configurada!");
         }
 
         Debug.Log($"📋 Sequência de rooms gerada: {roomSequence.Count} rooms no total");
+        Debug.Log($"   - {shopsAdded} shops");
+        Debug.Log($"   - {(allRooms.Count < totalShopsBeforeBoss ? allRooms.Count : totalShopsBeforeBoss)} rooms normais");
+        Debug.Log($"   - 1 boss");
+        
         for (int i = 0; i < roomSequence.Count; i++)
         {
-            Debug.Log($"  {i + 1}. {roomSequence[i]}");
+            string roomType = "";
+            if (roomSequence[i] == shopRoomScene)
+                roomType = " [🛒 SHOP]";
+            else if (roomSequence[i] == bossRoomScene)
+                roomType = " [🐉 BOSS]";
+            
+            Debug.Log($"  {i + 1}. {roomSequence[i]}{roomType}");
         }
     }
 
-    // ✅ NOVO - Método público para iniciar o jogo (chamado pelo botão)
+    // ✅ Método público para iniciar o jogo (chamado pelo botão)
     public void StartGame()
     {
         if (roomSequence.Count > 0)
@@ -171,7 +194,6 @@ public class RoomManager : MonoBehaviour
         }
     }
 
-    // ✅ NOVO - Instancia o player na primeira vez
     void SpawnPlayer()
     {
         // Procura por um player já existente (persistente)
@@ -198,7 +220,6 @@ public class RoomManager : MonoBehaviour
         }
     }
 
-    // Helper coroutine para esperar um ou mais frames e então posicionar (evita problemas de timing)
     IEnumerator EnsurePositionAfterFrames(GameObject player, int framesToWait = 1)
     {
         for (int i = 0; i < framesToWait; i++)
@@ -206,7 +227,6 @@ public class RoomManager : MonoBehaviour
         PositionPlayer(player);
     }
 
-    // Mantém compatibilidade com chamadas antigas
     void PositionPlayer(GameObject player = null)
     {
         if (player == null)

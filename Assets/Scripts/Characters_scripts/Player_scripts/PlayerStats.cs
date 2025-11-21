@@ -9,7 +9,7 @@ public class PlayerStats : MonoBehaviour
     private int currentDamageBonus = 0;
     
     [Header("Movement Stats")]
-    [SerializeField] private float baseSpeed = 5f;
+    [SerializeField] private float baseSpeed = 8f;
     private float currentSpeedBonus = 0f;
     
     [Header("Attack Speed Stats")]
@@ -52,14 +52,6 @@ public class PlayerStats : MonoBehaviour
     public void IncreaseSpeed(float amount)
     {
         currentSpeedBonus += amount;
-        
-        // Atualiza a velocidade do PlayerMovement
-        PlayerMovement movement = GetComponent<PlayerMovement>();
-        if (movement != null)
-        {
-            movement.UpdateSpeed(GetTotalSpeed());
-        }
-        
         Debug.Log($"🏃 Velocidade aumentada em {amount}! Velocidade total: {GetTotalSpeed()}");
     }
     
@@ -74,12 +66,5 @@ public class PlayerStats : MonoBehaviour
         currentDamageBonus = 0;
         currentSpeedBonus = 0;
         currentAttackSpeedBonus = 0;
-        
-        // Restaura velocidade base
-        PlayerMovement movement = GetComponent<PlayerMovement>();
-        if (movement != null)
-        {
-            movement.UpdateSpeed(baseSpeed);
-        }
     }
 }

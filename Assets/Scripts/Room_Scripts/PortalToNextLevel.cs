@@ -1,33 +1,49 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 [RequireComponent(typeof(Collider2D))]
 public class Portal : MonoBehaviour
 {
     [Header("Portal Settings")]
-    [Tooltip("Nome exato da cena a ser carregada (case-sensitive).")]
+    [Tooltip("Se true, usa o RoomManager para carregar próxima room. Se false, carrega targetSceneName manualmente.")]
+    public bool useRoomManager = true;
+    
+    [Tooltip("Nome exato da cena a ser carregada (case-sensitive). Só usado se useRoomManager = false")]
     public string targetSceneName = "Arena_Inferno";
+    
     [Tooltip("Se true, teleporta automaticamente ao entrar no trigger sem pressionar tecla.")]
     public bool autoActivate = false;
+    
     [Tooltip("Tecla para ativar o portal quando dentro do trigger.")]
     public KeyCode activateKey = KeyCode.E;
+    
     [Tooltip("Tempo de espera (seg) depois do carregamento para spawnar ou animações.")]
     public float postLoadDelay = 0.1f;
 
     [Header("UI")]
-    public GameObject promptUIPrefab; // opcional: prefab do texto "Press E"
+    public GameObject interactionCanvas; // Referência ao Canvas filho
 
     // runtime
     private bool playerInRange = false;
-    private GameObject promptInstance;
     private GameObject playerObject;
     private bool isLoading = false;
 
+    void Start()
+    {
+        // Se não atribuiu manualmente, tenta achar o canvas filho
+        if (interactionCanvas == null)
+        {
+            interactionCanvas = transform.Find("InteractionCanvas")?.gameObject;
+        }
+        
+        // Começa escondido
+        if (interactionCanvas != null)
+            interactionCanvas.SetActive(false);
+    }
+
     void Reset()
     {
-        // garante trigger no Collider2D
         var col = GetComponent<Collider2D>();
         col.isTrigger = true;
     }
@@ -73,16 +89,32 @@ public class Portal : MonoBehaviour
         isLoading = true;
         ShowPrompt(false);
 
-        // Optionally disable player control if a script exists
         var controller = playerObject != null ? playerObject.GetComponent<MonoBehaviour>() : null;
         if (controller != null)
-            controller.enabled = false; // WARNING: this disables that single component only
+            controller.enabled = false;
 
-        // Sanitize scene name
+        // ✅ NOVO - Usa RoomManager se disponível
+        if (useRoomManager && RoomManager.Instance != null)
+        {
+            Debug.Log($"[Portal] Carregando próxima room via RoomManager...");
+            
+            yield return new WaitForSeconds(postLoadDelay);
+            
+            // Chama o RoomManager para carregar a próxima room
+            RoomManager.Instance.LoadNextRoom();
+            
+            // O RoomManager cuida do resto, então só reabilitamos o controller
+            if (controller != null)
+                controller.enabled = true;
+                
+            isLoading = false;
+            yield break;
+        }
+
+        // ✅ FALLBACK - Carrega scene manualmente se RoomManager não estiver disponível
         string sceneName = targetSceneName?.Trim().Replace("\"", "").Replace("'", "");
-        Debug.Log($"[Portal] Carregando cena '{sceneName}'...");
+        Debug.Log($"[Portal] Carregando cena '{sceneName}' manualmente...");
 
-        // Try load async and handle null / missing scene
         AsyncOperation asyncLoad = null;
         try
         {
@@ -101,13 +133,11 @@ public class Portal : MonoBehaviour
             yield break;
         }
 
-        // opcional: mostrar tela de transição (fade out) aqui
         while (!asyncLoad.isDone)
             yield return null;
 
         yield return new WaitForSeconds(postLoadDelay);
 
-        // opcional: reativa controles (se o player foi re-instantied, talvez precise buscar novo objeto)
         if (controller != null)
             controller.enabled = true;
 
@@ -116,25 +146,7 @@ public class Portal : MonoBehaviour
 
     private void ShowPrompt(bool show)
     {
-        if (promptUIPrefab == null) return;
-
-        if (show)
-        {
-            if (promptInstance == null)
-            {
-                // cria no Canvas principal (procura por Canvas)
-                Canvas canvas = FindObjectOfType<Canvas>();
-                if (canvas != null)
-                    promptInstance = Instantiate(promptUIPrefab, canvas.transform);
-                else
-                    promptInstance = Instantiate(promptUIPrefab);
-            }
-            promptInstance.SetActive(true);
-        }
-        else
-        {
-            if (promptInstance != null)
-                promptInstance.SetActive(false);
-        }
+        if (interactionCanvas != null)
+            interactionCanvas.SetActive(show);
     }
 }
