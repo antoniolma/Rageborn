@@ -6,7 +6,7 @@ public class Enemy : MonoBehaviour
     [Header("Enemy Stats")]
     [SerializeField] protected int maxHealth = 50; // ✅ ADICIONADO
     [SerializeField] protected int damage = 10;
-    [SerializeField] protected float moveSpeed = 2f;
+    [SerializeField] protected float moveSpeed = 2f; // ⚠️ Bosses sobrescrevem isso no Start()
     [SerializeField] protected float attackRange = 1.5f;
     [SerializeField] protected float attackCooldown = 1f;
     
@@ -115,11 +115,20 @@ public class Enemy : MonoBehaviour
     // ⚠️ MANTÉM PARA COMPATIBILIDADE (mas agora só redireciona para EnemyHealth)
     public virtual void TakeDamage(int damageAmount)
     {
+        // Chama a versão com WeaponType usando Fire como padrão
+        TakeDamage(damageAmount, WeaponType.Fire);
+    }
+    
+    /// <summary>
+    /// TakeDamage com tipo de arma para flash colorido
+    /// </summary>
+    public virtual void TakeDamage(int damageAmount, WeaponType weaponType)
+    {
         if (enemyHealth != null)
         {
             // Permite que subclasses modifiquem o dano (ex: Golem com armadura)
             int finalDamage = ModifyIncomingDamage(damageAmount);
-            enemyHealth.TakeDamage(finalDamage);
+            enemyHealth.TakeDamage(finalDamage, weaponType);
         }
         else
         {
@@ -140,4 +149,27 @@ public class Enemy : MonoBehaviour
     public float GetMoveSpeed() => moveSpeed;
     public float GetAttackRange() => attackRange;
     public int GetMaxHealth() => maxHealth; // ✅ ADICIONADO
+    
+    /// <summary>
+    /// Define a velocidade de movimento (usado por debuffs/buffs)
+    /// </summary>
+    public void SetMoveSpeed(float newSpeed)
+    {
+        moveSpeed = newSpeed;
+        
+        // Atualiza NavMeshAgent se existir
+        if (navAgent != null && navAgent.isActiveAndEnabled)
+        {
+            navAgent.speed = newSpeed;
+        }
+    }
+    
+    /// <summary>
+    /// Retorna a velocidade base (sem debuffs/buffs)
+    /// Bosses podem sobrescrever para retornar velocidade baseada na fase
+    /// </summary>
+    public virtual float GetBaseMoveSpeed()
+    {
+        return moveSpeed;
+    }
 }

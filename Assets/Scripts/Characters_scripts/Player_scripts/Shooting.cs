@@ -178,6 +178,14 @@ public class Shooting : MonoBehaviour
             {
                 GameObject Bullet = Instantiate(FireBullet, swordTransform.position, Quaternion.identity);
                 Bullet.transform.rotation = sword.transform.rotation;
+                
+                // Define o tipo de arma no bullet
+                var bulletScript = Bullet.GetComponent<Bullet>();
+                if (bulletScript != null)
+                {
+                    bulletScript.SetWeaponType(WeaponType.Fire);
+                }
+                
                 var sr = Bullet.GetComponent<SpriteRenderer>();
                 if (sr != null)
                 {
@@ -194,6 +202,14 @@ public class Shooting : MonoBehaviour
             {
                 GameObject Bullet = Instantiate(IceBullet, swordTransform.position, Quaternion.identity);
                 Bullet.transform.rotation = sword.transform.rotation;
+                
+                // Define o tipo de arma no bullet
+                var bulletScript = Bullet.GetComponent<Bullet>();
+                if (bulletScript != null)
+                {
+                    bulletScript.SetWeaponType(WeaponType.Ice);
+                }
+                
                 var sr = Bullet.GetComponent<SpriteRenderer>();
                 if (sr != null)
                 {
@@ -210,6 +226,14 @@ public class Shooting : MonoBehaviour
             {
                 GameObject Bullet = Instantiate(VenomBullet, swordTransform.position, Quaternion.identity);
                 Bullet.transform.rotation = sword.transform.rotation;
+                
+                // Define o tipo de arma no bullet
+                var bulletScript = Bullet.GetComponent<Bullet>();
+                if (bulletScript != null)
+                {
+                    bulletScript.SetWeaponType(WeaponType.Venom);
+                }
+                
                 var sr = Bullet.GetComponent<SpriteRenderer>();
                 if (sr != null)
                 {

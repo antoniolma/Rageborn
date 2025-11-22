@@ -32,6 +32,7 @@ public class EnemyHealth : MonoBehaviour
     // Components
     private DamageFlash damageFlash;
     private EnemyCoinDropper coinDropper;
+    private EnemyStatusEffects statusEffects;
     
     // Event que o spawner escuta
     public event Action OnDeath;
@@ -46,6 +47,13 @@ public class EnemyHealth : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         damageFlash = GetComponent<DamageFlash>();
         coinDropper = GetComponent<EnemyCoinDropper>();
+        statusEffects = GetComponent<EnemyStatusEffects>();
+        
+        // Se não tem EnemyStatusEffects, adiciona automaticamente
+        if (statusEffects == null)
+        {
+            statusEffects = gameObject.AddComponent<EnemyStatusEffects>();
+        }
         
         // Se não encontrou EnemyHealthBar mas encontrou HealthBar (antigo), avisa
         if (healthBarScript == null)
@@ -54,26 +62,31 @@ public class EnemyHealth : MonoBehaviour
         }
     }
     
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, WeaponType weaponType = WeaponType.Fire, bool applyStatusEffects = true)
     {
         if (currentHealth <= 0) return; // Já está morto
         
         currentHealth -= damage;
         currentHealth = Mathf.Max(currentHealth, 0);
         
-        Debug.Log($"👾 {gameObject.name} tomou {damage} de dano! HP: {currentHealth}/{maxHealth}");
+        Debug.Log($"👾 {gameObject.name} tomou {damage} de dano de {WeaponTypeHelper.GetWeaponName(weaponType)}! HP: {currentHealth}/{maxHealth}");
         
         // ===== FEEDBACK VISUAL =====
         
-        // 1. Flash de dano (se tiver DamageFlash)
-        if (damageFlash != null)
+        // 1. Flash de dano (se tiver DamageFlash) com cor baseada no tipo de arma
+        // ⚠️ EXCETO para Ice - o gelo tem efeito visual próprio (azul piscando)
+        if (weaponType != WeaponType.Ice)
         {
-            damageFlash.Flash();
-        }
-        else if (spriteRenderer != null)
-        {
-            // Fallback: flash manual
-            StartCoroutine(FlashDamage());
+            if (damageFlash != null)
+            {
+                damageFlash.FlashWithWeaponType(weaponType);
+            }
+            else if (spriteRenderer != null)
+            {
+                // Fallback: flash manual com cor da arma
+                Color weaponColor = WeaponTypeHelper.GetDamageFlashColor(weaponType);
+                StartCoroutine(FlashDamage(weaponColor));
+            }
         }
         
         // 2. Atualiza HealthBar
@@ -86,6 +99,31 @@ public class EnemyHealth : MonoBehaviour
         if (audioSource != null && hurtSound != null)
         {
             audioSource.PlayOneShot(hurtSound);
+        }
+        
+        // ===== EFEITOS ESPECIAIS POR TIPO DE ARMA =====
+        // ⚠️ IMPORTANTE: Só aplica efeitos de status no hit inicial, NÃO nos ticks de queimadura!
+        if (statusEffects != null && applyStatusEffects)
+        {
+            switch (weaponType)
+            {
+                case WeaponType.Fire:
+                    // 🔥 Fogo: Dano ao longo do tempo (3 ticks de dano a cada 0.8s)
+                    // Dano por tick = 20% (1/5) do dano inicial do golpe
+                    int burnDamage = Mathf.Max(1, Mathf.RoundToInt(damage * 0.2f));
+                    statusEffects.ApplyBurnEffect(burnDamage);
+                    break;
+                
+                case WeaponType.Ice:
+                    // ❄️ Gelo: Reduz velocidade para 2/3 por 1.2s
+                    statusEffects.ApplyFreezeEffect();
+                    break;
+                
+                case WeaponType.Venom:
+                    // 🧪 Veneno: (pode adicionar efeito depois se quiser)
+                    // Por enquanto só o dano normal
+                    break;
+            }
         }
         
         // ===== MORTE =====
@@ -140,12 +178,12 @@ public class EnemyHealth : MonoBehaviour
         Destroy(gameObject, deathDelay);
     }
     
-    System.Collections.IEnumerator FlashDamage()
+    System.Collections.IEnumerator FlashDamage(Color colorToFlash)
     {
         if (spriteRenderer == null) yield break;
         
         Color originalColor = spriteRenderer.color;
-        spriteRenderer.color = damageColor;
+        spriteRenderer.color = colorToFlash;
         yield return new WaitForSeconds(flashDuration);
         
         // Verifica se ainda existe antes de restaurar cor

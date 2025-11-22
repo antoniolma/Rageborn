@@ -10,6 +10,7 @@ public class Bullet : MonoBehaviour
     [SerializeField] private float force = 20f;
     [SerializeField] private int damage = 10;
     [SerializeField] private float lifetime = 5f;
+    [SerializeField] private WeaponType weaponType = WeaponType.Fire; // Tipo da arma (define cor do flash)
     
     [Header("Visual Effects (Optional)")]
     [SerializeField] private GameObject hitEffectPrefab;
@@ -69,8 +70,8 @@ public class Bullet : MonoBehaviour
             Enemy enemy = collision.GetComponent<Enemy>();
             if (enemy != null)
             {
-                enemy.TakeDamage(damage);
-                Debug.Log($"💥 Bullet acertou Enemy! Dano: {damage}");
+                enemy.TakeDamage(damage, weaponType);
+                Debug.Log($"💥 Bullet acertou Enemy! Dano: {damage} | Tipo: {WeaponTypeHelper.GetWeaponName(weaponType)}");
             }
             
             SpawnHitEffect();
@@ -98,5 +99,11 @@ public class Bullet : MonoBehaviour
     public void SetDamage(int newDamage)
     {
         damage = newDamage;
+    }
+    
+    // Função pública para definir o tipo de arma (define a cor do flash de dano)
+    public void SetWeaponType(WeaponType type)
+    {
+        weaponType = type;
     }
 }

@@ -29,16 +29,36 @@ public class DamageFlash : MonoBehaviour
     {
         if (spriteRenderer != null)
         {
-            StartCoroutine(FlashCoroutine());
+            StartCoroutine(FlashCoroutine(flashColor));
         }
     }
     
-    private IEnumerator FlashCoroutine()
+    /// <summary>
+    /// Flash com cor customizada (usado para diferentes tipos de arma)
+    /// </summary>
+    public void Flash(Color customColor)
+    {
+        if (spriteRenderer != null)
+        {
+            StartCoroutine(FlashCoroutine(customColor));
+        }
+    }
+    
+    /// <summary>
+    /// Flash baseado no tipo de arma
+    /// </summary>
+    public void FlashWithWeaponType(WeaponType weaponType)
+    {
+        Color weaponFlashColor = WeaponTypeHelper.GetDamageFlashColor(weaponType);
+        Flash(weaponFlashColor);
+    }
+    
+    private IEnumerator FlashCoroutine(Color colorToFlash)
     {
         for (int i = 0; i < numberOfFlashes; i++)
         {
             // Flash para a cor de dano
-            spriteRenderer.color = flashColor;
+            spriteRenderer.color = colorToFlash;
             yield return new WaitForSeconds(flashDuration);
             
             // Volta para a cor original

@@ -630,6 +630,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef69213988cc9de80a23df6b319ddcde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startingRunCoins: 100
   runCoinsText: {fileID: 360189315}
   metaCoinsText: {fileID: 0}
 --- !u!4 &888334919
@@ -1281,7 +1282,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 20
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1321,9 +1322,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 2075511506}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c24cfece1ca1f45a09ba6ab40ebabb74, type: 3}
+  m_Script: {fileID: 11500000, guid: 48589bfa1003bbb4ebd0dcb64f0d3690, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  smoothSpeed: 5
+  offset: {x: 0, y: 0, z: -10}
 --- !u!114 &2075511511
 MonoBehaviour:
   m_ObjectHideFlags: 0

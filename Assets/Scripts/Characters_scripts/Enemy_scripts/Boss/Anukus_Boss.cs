@@ -69,12 +69,22 @@ public class Anukus_Boss : Enemy
     private Coroutine chargeFlashCoroutine;
     private Color originalColor;
     
+    // ✅ Armazena a velocidade base da fase atual (sem debuffs)
+    private float currentBaseMoveSpeed;
+    
     protected override void Start()
     {
         base.Start();
         
-        // Define valores iniciais a partir das variáveis serializadas
+        // ✅ FORÇA valores do boss, IGNORANDO completamente Enemy.moveSpeed!
         moveSpeed = normalMoveSpeed;
+        currentBaseMoveSpeed = normalMoveSpeed;
+        
+        // ✅ SOBRESCREVE NavMeshAgent também
+        if (navAgent != null && navAgent.isActiveAndEnabled)
+        {
+            navAgent.speed = normalMoveSpeed;
+        }
         
         rb = GetComponent<Rigidbody2D>();
         if (rb == null)
@@ -123,12 +133,21 @@ public class Anukus_Boss : Enemy
         
         ChangeState(AnukusState.Chasing);
         
-        Debug.Log("⚔️ ANUKUS (O IRMÃO FORTE) ENTROU NA LUTA! ⚔️");
+        Debug.Log("⚜️ ANUKUS (O IRMÃO FORTE) ENTROU NA LUTA! ⚜️");
+        Debug.Log($"⚜️ ANUKUS - Velocidades configuradas:");
+        Debug.Log($"  • normalMoveSpeed (SerializeField): {normalMoveSpeed}");
+        Debug.Log($"  • phase2MoveSpeed (SerializeField): {phase2MoveSpeed}");
+        Debug.Log($"  • moveSpeed (atual): {moveSpeed}");
+        Debug.Log($"  • navAgent.speed: {(navAgent != null ? navAgent.speed.ToString() : "N/A")}");
     }
     
     protected override void Update()
     {
         if (isDead) return;
+        
+        // ✅ GARANTE que moveSpeed nunca fica diferente do esperado
+        // (previne bugs de sincronização com a classe base)
+        EnsureCorrectSpeed();
         
         // Se o player morreu ou desapareceu, volta para a posição inicial
         if (player == null || !player.gameObject.activeInHierarchy)
@@ -231,21 +250,21 @@ public class Anukus_Boss : Enemy
         
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
         
-        // Usa a velocidade apropriada da fase atual
-        float currentSpeed = currentPhase >= 2 ? phase2MoveSpeed : normalMoveSpeed;
-        moveSpeed = currentSpeed; // Atualiza moveSpeed da classe base também
+        // ✅ NÃO sobrescreve moveSpeed - respeita debuffs aplicados!
+        // moveSpeed já foi modificado por EnemyStatusEffects se houver debuff
         
         // Move em direção ao player
         Vector2 direction = (player.position - transform.position).normalized;
         
         if (navAgent != null && navAgent.isActiveAndEnabled)
         {
-            navAgent.speed = currentSpeed;
+            // ✅ Usa moveSpeed atual (que pode estar com debuff)
+            navAgent.speed = moveSpeed;
             navAgent.SetDestination(player.position);
         }
         else if (rb != null)
         {
-            rb.MovePosition(rb.position + direction * currentSpeed * Time.deltaTime);
+            rb.MovePosition(rb.position + direction * moveSpeed * Time.deltaTime);
         }
         
         // Atualiza animação
@@ -520,7 +539,7 @@ public class Anukus_Boss : Enemy
     // ========================================
     void UpdateMovementAnimation(Vector2 direction)
     {
-        if (animator == null) return;
+        if (animator == null || !animator.isActiveAndEnabled) return;
         
         // Salva a direção atual
         if (direction.magnitude > 0.1f)
@@ -536,56 +555,65 @@ public class Anukus_Boss : Enemy
             lastMovementCheck = Time.time;
         }
         
-        string animPrefix = isCurrentlyMoving ? "Walk" : "Idle";
-        
-        // Determina direção
-        if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+        try
         {
-            animator.Play(animPrefix + "Side");
-            transform.localScale = direction.x > 0 ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
-        }
-        else
-        {
-            if (direction.y > 0)
-                animator.Play(animPrefix + "Up");
+            string animPrefix = isCurrentlyMoving ? "Walk" : "Idle";
+            
+            // Determina direção
+            if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+            {
+                animator.Play(animPrefix + "Side");
+                transform.localScale = direction.x > 0 ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
+            }
             else
-                animator.Play(animPrefix + "Down");
+            {
+                if (direction.y > 0)
+                    animator.Play(animPrefix + "Up");
+                else
+                    animator.Play(animPrefix + "Down");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"⚠️ Erro ao atualizar animação de movimento: {e.Message}");
         }
     }
     
     void PlayAttackAnimation(Vector2 direction)
     {
-        if (animator == null) return;
+        if (animator == null || !animator.isActiveAndEnabled) return;
         
-        // Determina direção do ataque
-        if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+        // Proteção extra contra Animator Controller corrompido
+        try
         {
-            // Tenta tocar a animação, mas não gera erro se não existir
-            if (HasAnimationState("AttackSide"))
-                animator.Play("AttackSide");
+            // Determina direção do ataque
+            if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+            {
+                // Tenta tocar a animação, mas não gera erro se não existir
+                if (HasAnimationState("AttackSide"))
+                    animator.Play("AttackSide");
+                
+                transform.localScale = direction.x > 0 ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
+            }
             else
-                // animator.Play("IdleSide"); // Fallback
-                ;
-            
-            transform.localScale = direction.x > 0 ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
+            {
+                if (direction.y > 0)
+                {
+                    if (HasAnimationState("AttackUp"))
+                        animator.Play("AttackUp");
+                }
+                else
+                {
+                    if (HasAnimationState("AttackDown"))
+                        animator.Play("AttackDown");
+                    else
+                        animator.Play("IdleDown"); // Fallback
+                }
+            }
         }
-        else
+        catch (System.Exception e)
         {
-            if (direction.y > 0)
-            {
-                if (HasAnimationState("AttackUp"))
-                    animator.Play("AttackUp");
-                else
-                    // animator.Play("IdleUp"); // Fallback
-                    ;
-            }
-            else
-            {
-                if (HasAnimationState("AttackDown"))
-                    animator.Play("AttackDown");
-                else
-                    animator.Play("IdleDown"); // Fallback
-            }
+            Debug.LogWarning($"⚠️ Erro ao tocar animação de ataque: {e.Message}");
         }
     }
     
@@ -620,6 +648,16 @@ public class Anukus_Boss : Enemy
     void EnterPhase2()
     {
         currentPhase = 2;
+        
+        // ✅ Atualiza velocidade base para fase 2
+        currentBaseMoveSpeed = phase2MoveSpeed;
+        moveSpeed = phase2MoveSpeed;
+        
+        // Atualiza NavMeshAgent se existir
+        if (navAgent != null && navAgent.isActiveAndEnabled)
+        {
+            navAgent.speed = phase2MoveSpeed;
+        }
         
         if (bossSprite != null)
         {
@@ -746,5 +784,42 @@ public class Anukus_Boss : Enemy
             Gizmos.color = Color.yellow;
             Gizmos.DrawLine(transform.position, transform.position + (Vector3)(attackDirection * meleeAttackRange));
         }
+    }
+    
+    // ========================================
+    // CORREÇÃO DE VELOCIDADE
+    // ========================================
+    
+    /// <summary>
+    /// Garante que a velocidade está correta (previne conflitos com classe base)
+    /// </summary>
+    void EnsureCorrectSpeed()
+    {
+        float expectedBaseSpeed = currentPhase >= 2 ? phase2MoveSpeed : normalMoveSpeed;
+        
+        // Se moveSpeed está muito diferente da velocidade esperada, corrige
+        // (permite pequenas variações por debuffs, mas detecta resets indevidos)
+        if (moveSpeed > expectedBaseSpeed * 1.1f)
+        {
+            Debug.LogWarning($"⚠️ ANUKUS: Velocidade incorreta detectada ({moveSpeed}), corrigindo para {expectedBaseSpeed}");
+            moveSpeed = expectedBaseSpeed;
+            
+            if (navAgent != null && navAgent.isActiveAndEnabled)
+            {
+                navAgent.speed = expectedBaseSpeed;
+            }
+        }
+    }
+    
+    // ========================================
+    // MÉTODOS PÚBLICOS
+    // ========================================
+    
+    /// <summary>
+    /// Retorna a velocidade base atual (sem debuffs) para que EnemyStatusEffects possa restaurar corretamente
+    /// </summary>
+    public override float GetBaseMoveSpeed()
+    {
+        return currentPhase >= 2 ? phase2MoveSpeed : normalMoveSpeed;
     }
 }

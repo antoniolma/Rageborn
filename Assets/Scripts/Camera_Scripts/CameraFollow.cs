@@ -6,8 +6,22 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private float smoothSpeed = 5f;
     [SerializeField] private Vector3 offset = new Vector3(0, 0, -10f);
     
+    private Camera cam;
+    
     void Start()
     {
+        // ✅ Força o tamanho ortográfico da câmera para 10
+        cam = GetComponent<Camera>();
+        if (cam != null && cam.orthographic)
+        {
+            cam.orthographicSize = 10f;
+            Debug.Log("📷 CameraFollow - Tamanho ortográfico definido para 10");
+        }
+        else if (cam != null && !cam.orthographic)
+        {
+            Debug.LogWarning("⚠️ CameraFollow - Câmera não está em modo ortográfico! Defina Projection como Orthographic.");
+        }
+        
         // Se não definir um target no Inspector, procura o jogador
         if (target == null)
         {

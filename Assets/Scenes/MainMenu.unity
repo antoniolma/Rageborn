@@ -936,7 +936,8 @@ MonoBehaviour:
   - Arena_dungeon
   shopRoomScene: Shop_Dungeon
   bossRoomScene: BossArena
-  roomsBeforeShop: 1
+  timesEachRoomAppears: 2
+  totalShopsBeforeBoss: 4
   playerSpawnOffset: {x: 5, y: 5}
 --- !u!1 &309386371
 GameObject:

@@ -26405,17 +26405,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 463129704846963285, guid: b45f62dfdaca7bf4fbaf4cb2bb17a85b, type: 3}
-      propertyPath: m_SortingOrder
-      value: 4
-      objectReference: {fileID: 0}
     - target: {fileID: 1784093990636179302, guid: b45f62dfdaca7bf4fbaf4cb2bb17a85b, type: 3}
-      propertyPath: speed
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 4719352395281743893, guid: b45f62dfdaca7bf4fbaf4cb2bb17a85b, type: 3}
-      propertyPath: baseSpeed
-      value: 45
+      propertyPath: TypeSword
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7916472914964482766, guid: b45f62dfdaca7bf4fbaf4cb2bb17a85b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -26525,7 +26517,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 8
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -26759,13 +26751,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 350
   damage: 40
-  moveSpeed: 18
+  moveSpeed: 35
   attackRange: 1.5
   attackCooldown: 1
   flipSpriteBasedOnDirection: 1
   healthBarCanvas: {fileID: 0}
-  attackSound: {fileID: 0}
-  normalMoveSpeed: 18
+  attackSound: {fileID: 8300000, guid: 07d3624388187494abe549889a6a4704, type: 3}
+  normalMoveSpeed: 35
   minDistanceFromPlayer: 8
   maxDistanceFromPlayer: 15
   positioningTolerance: 1
@@ -26780,7 +26772,7 @@ MonoBehaviour:
   phase2Color: {r: 1, g: 0.3, b: 0.3, a: 1}
   rageParticles: {fileID: 69087266}
   bossSprite: {fileID: 0}
-  animator: {fileID: 0}
+  animator: {fileID: 1045461599}
 --- !u!61 &1045461604
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -27019,14 +27011,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 800
-  damage: 40
-  moveSpeed: 16
+  damage: 25
+  moveSpeed: 40
   attackRange: 1.5
   attackCooldown: 1
   flipSpriteBasedOnDirection: 1
   healthBarCanvas: {fileID: 0}
-  attackSound: {fileID: 0}
-  normalMoveSpeed: 16
+  attackSound: {fileID: 8300000, guid: 17d0697f287f24747bd6cd3c68594633, type: 3}
+  normalMoveSpeed: 25
   meleeAttackRange: 2.5
   backstepDistance: 1
   attackCooldownTime: 2
@@ -27037,14 +27029,14 @@ MonoBehaviour:
   attackHitbox: {fileID: 1966129955}
   swordHitboxDistance: 1.2
   hitboxActivationDelay: 0.15
-  phase2MoveSpeed: 22
-  phase2AttackCooldown: 1
+  phase2MoveSpeed: 40
+  phase2AttackCooldown: 0.8
   phase2SwordDamage: 80
   phase2Color: {r: 1, g: 0.3, b: 0.3, a: 1}
   rageParticles: {fileID: 705426081}
   phase2DoubleAttack: 1
   bossSprite: {fileID: 0}
-  animator: {fileID: 0}
+  animator: {fileID: 1205285332}
   deathAnimationDuration: 1.5
 --- !u!61 &1205285336
 BoxCollider2D:

@@ -65,12 +65,26 @@ public class Bob_Boss : Enemy
     private Coroutine chargeFlashCoroutine;
     private Color originalColor;
     
+    // ✅ Armazena a velocidade base da fase atual (sem debuffs)
+    private float currentBaseMoveSpeed;
+    
+    // ❄️ Multiplier de dash (afetado por congelamento)
+    private float dashSpeedMultiplier = 1f;
+    
     protected override void Start()
     {
         base.Start();
         
-        // Define valores iniciais a partir das variáveis serializadas
+        // ✅ FORÇA valores do boss, IGNORANDO completamente Enemy.moveSpeed!
         moveSpeed = normalMoveSpeed;
+        currentBaseMoveSpeed = normalMoveSpeed;
+        dashSpeedMultiplier = 1f; // ❄️ Garante que dash começa em 100%
+        
+        // ✅ SOBRESCREVE NavMeshAgent também
+        if (navAgent != null && navAgent.isActiveAndEnabled)
+        {
+            navAgent.speed = normalMoveSpeed;
+        }
         
         rb = GetComponent<Rigidbody2D>();
         if (rb == null)
@@ -121,7 +135,13 @@ public class Bob_Boss : Enemy
         
         ChangeState(BobState.Positioning);
         
-        // Debug.Log("⚡ BOB (O IRMÃO ÁGIL) ENTROU NA LUTA! ⚡");
+        Debug.Log("⚡ BOB (O IRMÃO ÁGIL) ENTROU NA LUTA! ⚡");
+        Debug.Log($"⚡ BOB - Velocidades configuradas:");
+        Debug.Log($"  • normalMoveSpeed (SerializeField): {normalMoveSpeed}");
+        Debug.Log($"  • dashSpeed (SerializeField): {dashSpeed}");
+        Debug.Log($"  • moveSpeed (atual): {moveSpeed}");
+        Debug.Log($"  • dashSpeedMultiplier: {dashSpeedMultiplier}x");
+        Debug.Log($"  • navAgent.speed: {(navAgent != null ? navAgent.speed.ToString() : "N/A")}");
     }
     
     protected override void Update()
@@ -257,12 +277,13 @@ public class Bob_Boss : Enemy
         
         if (navAgent != null && navAgent.isActiveAndEnabled)
         {
-            navAgent.speed = normalMoveSpeed;
+            // ✅ Usa moveSpeed atual (que pode estar com debuff)
+            navAgent.speed = moveSpeed;
             navAgent.SetDestination(targetPosition);
         }
         else if (rb != null)
         {
-            rb.MovePosition(currentPos + direction * normalMoveSpeed * Time.deltaTime);
+            rb.MovePosition(currentPos + direction * moveSpeed * Time.deltaTime);
         }
         
         // Atualiza animações de movimento
@@ -317,7 +338,10 @@ public class Bob_Boss : Enemy
     // ========================================
     void HandleDashing()
     {
-        float currentDashSpeed = currentPhase >= 2 ? phase2DashSpeed : dashSpeed;
+        float baseDashSpeed = currentPhase >= 2 ? phase2DashSpeed : dashSpeed;
+        
+        // ❄️ Aplica multiplier de congelamento ao dash
+        float currentDashSpeed = baseDashSpeed * dashSpeedMultiplier;
         
         // Usa velocity para movimento consistente e rápido
         if (rb != null)
@@ -457,6 +481,18 @@ public class Bob_Boss : Enemy
     {
         currentPhase = 2;
         
+        // ✅ Atualiza velocidade base para fase 2 (mas NÃO sobrescreve se tiver debuff)
+        // Nota: Bob não muda velocidade de movimento na fase 2, só velocidade de dash
+        // Mantemos a normalMoveSpeed como base
+        currentBaseMoveSpeed = normalMoveSpeed;
+        
+        // Se não estiver com debuff, aplica velocidade normal
+        // (Se estiver com debuff, o EnemyStatusEffects já modificou moveSpeed)
+        if (moveSpeed == normalMoveSpeed)
+        {
+            moveSpeed = normalMoveSpeed;
+        }
+        
         if (bossSprite != null)
         {
             bossSprite.color = phase2Color;
@@ -468,7 +504,7 @@ public class Bob_Boss : Enemy
             rageParticles.Play();
         }
         
-        // Debug.Log("⚡💥 BOB ENFURECEU! DASHES MAIS RÁPIDOS! 💥⚡");
+        Debug.Log("⚡💥 BOB ENFURECEU! DASHES MAIS RÁPIDOS! 💥⚡");
     }
     
     // ========================================
@@ -667,5 +703,60 @@ public class Bob_Boss : Enemy
         // Posição alvo
         Gizmos.color = Color.green;
         Gizmos.DrawSphere(targetPosition, 0.5f);
+    }
+    
+    // ========================================
+    // CORREÇÃO DE VELOCIDADE
+    // ========================================
+    
+    /// <summary>
+    /// Garante que a velocidade está correta (previne conflitos com classe base)
+    /// </summary>
+    void EnsureCorrectSpeed()
+    {
+        // Bob sempre usa normalMoveSpeed (não muda entre fases)
+        float expectedSpeed = normalMoveSpeed;
+        
+        // Se moveSpeed está muito diferente da velocidade esperada, corrige
+        if (moveSpeed > expectedSpeed * 1.1f)
+        {
+            Debug.LogWarning($"⚠️ BOB: Velocidade incorreta detectada ({moveSpeed}), corrigindo para {expectedSpeed}");
+            moveSpeed = expectedSpeed;
+            
+            if (navAgent != null && navAgent.isActiveAndEnabled)
+            {
+                navAgent.speed = expectedSpeed;
+            }
+        }
+    }
+    
+    // ========================================
+    // MÉTODOS PÚBLICOS
+    // ========================================
+    
+    /// <summary>
+    /// Retorna a velocidade base atual (sem debuffs) para que EnemyStatusEffects possa restaurar corretamente
+    /// Bob não muda velocidade de movimento entre fases, só velocidade de dash
+    /// </summary>
+    public override float GetBaseMoveSpeed()
+    {
+        return normalMoveSpeed;
+    }
+    
+    /// <summary>
+    /// Define o multiplier de velocidade de dash (usado por debuffs como congelamento)
+    /// </summary>
+    public void SetDashSpeedMultiplier(float multiplier)
+    {
+        dashSpeedMultiplier = Mathf.Clamp(multiplier, 0.1f, 2f); // Limita entre 10% e 200%
+        Debug.Log($"⚡ BOB - Dash speed multiplier ajustado para {dashSpeedMultiplier:F2}x");
+    }
+    
+    /// <summary>
+    /// Retorna o multiplier atual de dash speed
+    /// </summary>
+    public float GetDashSpeedMultiplier()
+    {
+        return dashSpeedMultiplier;
     }
 }
