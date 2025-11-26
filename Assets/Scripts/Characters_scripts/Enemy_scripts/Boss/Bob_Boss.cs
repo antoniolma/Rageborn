@@ -29,7 +29,14 @@ public class Bob_Boss : Enemy
     [Header("📊 Visual")]
     [SerializeField] private SpriteRenderer bossSprite;
     [SerializeField] private Animator animator;
-    
+
+    [Header("Dash Safety")]
+    [SerializeField] private float maxDashDistance = 10f;          // Distância máxima do dash (ajuste no Inspector)
+    [SerializeField] private float dashStopBuffer = 0.2f;          // Distância de segurança antes da parede
+    [SerializeField] private LayerMask wallLayerMask;              // Layer(s) que bloqueiam o dash (paredes, limites)
+    [SerializeField] private Collider2D mapBoundsCollider = null; // (opcional) collider que representa os limites do mapa
+
+        
     // Estado
     private enum BobState
     {
@@ -60,6 +67,9 @@ public class Bob_Boss : Enemy
     
     private Rigidbody2D rb;
     private EnemyHealth bossHealth;
+
+    private Vector2 dashStartPos;
+    private float allowedDashDistance;
     
     // Charge indicator
     private Coroutine chargeFlashCoroutine;
@@ -212,7 +222,7 @@ public class Bob_Boss : Enemy
                 
             case BobState.Dashing:
                 if (navAgent != null)
-                    navAgent.enabled = false; // Desabilita navAgent durante dash
+                    navAgent.enabled = false;
                 if (dashTrail != null)
                     dashTrail.emitting = true;
                 // Para o flash e restaura cor
@@ -223,6 +233,43 @@ public class Bob_Boss : Enemy
                 }
                 if (bossSprite != null)
                     bossSprite.color = currentPhase >= 2 ? phase2Color : originalColor;
+
+                // --- NOVO: inicializa dash safety
+                dashStartPos = transform.position;
+
+                // calculamos a distância até o próximo obstáculo na direção do dash (se houver)
+                RaycastHit2D hit = Physics2D.Raycast(dashStartPos, dashDirection, maxDashDistance + 1f, wallLayerMask);
+                if (hit.collider != null)
+                {
+                    // permite parar um pouco antes da parede (buffer)
+                    allowedDashDistance = Mathf.Max(0f, hit.distance - dashStopBuffer);
+                }
+                else
+                {
+                    // se tiver um collider de limites do mapa, checar limite
+                    if (mapBoundsCollider != null)
+                    {
+                        // calcula interseção com bounds do collider (aproximação usando ponto final)
+                        Vector2 potentialEnd = dashStartPos + dashDirection * maxDashDistance;
+                        if (!mapBoundsCollider.OverlapPoint(potentialEnd))
+                        {
+                            // aproxima: faz um raycast mais longo para achar borda do mapa via layer da própria bounds (se preciso)
+                            RaycastHit2D hitBounds = Physics2D.Raycast(dashStartPos, dashDirection, maxDashDistance + 1f, 1 << mapBoundsCollider.gameObject.layer);
+                            if (hitBounds.collider != null)
+                                allowedDashDistance = Mathf.Max(0f, hitBounds.distance - dashStopBuffer);
+                            else
+                                allowedDashDistance = maxDashDistance;
+                        }
+                        else
+                        {
+                            allowedDashDistance = maxDashDistance;
+                        }
+                    }
+                    else
+                    {
+                        allowedDashDistance = maxDashDistance;
+                    }
+                }
                 break;
                 
             case BobState.Recovering:
@@ -339,11 +386,9 @@ public class Bob_Boss : Enemy
     void HandleDashing()
     {
         float baseDashSpeed = currentPhase >= 2 ? phase2DashSpeed : dashSpeed;
-        
-        // ❄️ Aplica multiplier de congelamento ao dash
         float currentDashSpeed = baseDashSpeed * dashSpeedMultiplier;
-        
-        // Usa velocity para movimento consistente e rápido
+
+        // Move usando velocity (consistente)
         if (rb != null)
         {
             rb.linearVelocity = dashDirection * currentDashSpeed;
@@ -352,20 +397,41 @@ public class Bob_Boss : Enemy
         {
             transform.position += (Vector3)(dashDirection * currentDashSpeed * Time.deltaTime);
         }
-        
-        // Define animação de dash APENAS UMA VEZ no início
+
         if (!dashAnimationSet)
         {
             UpdateDashAnimation(dashDirection);
             dashAnimationSet = true;
         }
-        
-        // Verifica se saiu do mapa ou atingiu distância máxima
-        float distanceTraveled = Vector2.Distance(transform.position, targetPosition);
-        
-        if (distanceTraveled > 30f) // Atravessou o mapa
+
+        // 1) Checa se ultrapassou a distância permitida
+        float traveled = Vector2.Distance(dashStartPos, (Vector2)transform.position);
+        if (traveled >= allowedDashDistance)
         {
+            // Para no final do dash seguro
+            if (rb != null) rb.linearVelocity = Vector2.zero;
             ChangeState(BobState.Recovering);
+            return;
+        }
+
+        // 2) Checagem extra: se houver parede inesperada à frente durante o dash, pare antes de atravessar
+        // usamos um BoxCast fino para detectar colisões rápidas (ajuste tamanho conforme hitbox do boss)
+        float castDistance = currentDashSpeed * Time.deltaTime + 0.1f;
+        Vector2 castSize = new Vector2(0.5f, 0.5f); // ajuste conforme o tamanho real do boss
+        RaycastHit2D obstacleHit = Physics2D.BoxCast(transform.position, castSize, 0f, dashDirection, castDistance, wallLayerMask);
+        if (obstacleHit.collider != null)
+        {
+            if (rb != null) rb.linearVelocity = Vector2.zero;
+            ChangeState(BobState.Recovering);
+            return;
+        }
+
+        // 3) Proteção adicional: se por alguma razão o boss saiu do mapa (fora de mapBoundsCollider), force Recovering
+        if (mapBoundsCollider != null && !mapBoundsCollider.OverlapPoint(transform.position))
+        {
+            if (rb != null) rb.linearVelocity = Vector2.zero;
+            ChangeState(BobState.Recovering);
+            return;
         }
     }
     
@@ -405,40 +471,38 @@ public class Bob_Boss : Enemy
             lastMovementCheck = Time.time;
         }
         
-        // Escolhe prefixo baseado em movimento
-        string animPrefix = isCurrentlyMoving ? "Walk" : "Idle";
-        
-        // Normaliza direção para achar qual é a predominante
-        if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+        try
         {
-            // Movimento horizontal predominante
-            animator.Play(animPrefix + "Side");
+            // Prefixo com nome da pasta
+            string folderPrefix = isCurrentlyMoving ? "Walk." : "Idle.";
+            string animSuffix;
             
-            // Inverte sprite baseado na direção
-            if (direction.x > 0)
+            // Normaliza direção para achar qual é a predominante
+            if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
             {
-                // Olhando para DIREITA - sprite normal
-                transform.localScale = new Vector3(1, 1, 1);
+                // Movimento horizontal predominante
+                animSuffix = isCurrentlyMoving ? "WalkSide" : "IdleSide";
+                
+                // Inverte sprite baseado na direção
+                if (direction.x > 0)
+                    transform.localScale = new Vector3(1, 1, 1);
+                else
+                    transform.localScale = new Vector3(-1, 1, 1);
             }
             else
             {
-                // Olhando para ESQUERDA - sprite invertido
-                transform.localScale = new Vector3(-1, 1, 1);
+                // Movimento vertical predominante
+                if (direction.y > 0)
+                    animSuffix = isCurrentlyMoving ? "WalkUp" : "IdleUp";
+                else
+                    animSuffix = isCurrentlyMoving ? "WalkDown" : "IdleDown";
             }
+            
+            animator.Play(folderPrefix + animSuffix);
         }
-        else
+        catch (System.Exception e)
         {
-            // Movimento vertical predominante
-            if (direction.y > 0)
-            {
-                // Olhando para CIMA
-                animator.Play(animPrefix + "Up");
-            }
-            else
-            {
-                // Olhando para BAIXO
-                animator.Play(animPrefix + "Down");
-            }
+            Debug.LogWarning($"⚠️ Erro ao atualizar animação de movimento: {e.Message}");
         }
     }
     
@@ -446,19 +510,20 @@ public class Bob_Boss : Enemy
     {
         if (animator == null) return;
         
-        // Sempre usa animação lateral (já que só faz dash horizontal)
-        animator.Play("DashSide");
-        
-        // Inverte sprite baseado na direção
-        if (direction.x > 0)
+        try
         {
-            // Dashando para DIREITA - sprite normal
-            transform.localScale = new Vector3(1, 1, 1);
+            // Sempre usa animação lateral (já que só faz dash horizontal)
+            animator.Play("Dash.DashSide");
+            
+            // Inverte sprite baseado na direção
+            if (direction.x > 0)
+                transform.localScale = new Vector3(1, 1, 1);
+            else
+                transform.localScale = new Vector3(-1, 1, 1);
         }
-        else
+        catch (System.Exception e)
         {
-            // Dashando para ESQUERDA - sprite invertido
-            transform.localScale = new Vector3(-1, 1, 1);
+            Debug.LogWarning($"⚠️ Erro ao atualizar animação de dash: {e.Message}");
         }
     }
     
@@ -529,6 +594,12 @@ public class Bob_Boss : Enemy
         
         if (chargeFlashCoroutine != null)
             StopCoroutine(chargeFlashCoroutine);
+
+        if (VictoryManager.Instance != null)
+        {
+            VictoryManager.Instance.NotifyBossDeath();
+            Debug.Log("NotifyBossDeath enviado para VictoryManager.");
+        }
         
         // Toca animação de morte baseada na última direção
         PlayDeathAnimation();
@@ -540,25 +611,32 @@ public class Bob_Boss : Enemy
     {
         if (animator == null) return;
         
-        // Determina qual animação de morte usar baseado na última direção
-        if (Mathf.Abs(lastFacingDirection.x) > Mathf.Abs(lastFacingDirection.y))
+        try
         {
-            // Estava olhando horizontalmente
-            animator.Play("DieSide");
-            
-            // Mantém o flip correto
-            if (lastFacingDirection.x > 0)
-                transform.localScale = new Vector3(1, 1, 1);
+            // Determina qual animação de morte usar baseado na última direção
+            if (Mathf.Abs(lastFacingDirection.x) > Mathf.Abs(lastFacingDirection.y))
+            {
+                // Estava olhando horizontalmente
+                animator.Play("Die.DieSide");
+                
+                // Mantém o flip correto
+                if (lastFacingDirection.x > 0)
+                    transform.localScale = new Vector3(1, 1, 1);
+                else
+                    transform.localScale = new Vector3(-1, 1, 1);
+            }
             else
-                transform.localScale = new Vector3(-1, 1, 1);
+            {
+                // Estava olhando verticalmente
+                if (lastFacingDirection.y > 0)
+                    animator.Play("Die.DieUp");
+                else
+                    animator.Play("Die.DieDown");
+            }
         }
-        else
+        catch (System.Exception e)
         {
-            // Estava olhando verticalmente
-            if (lastFacingDirection.y > 0)
-                animator.Play("DieUp");
-            else
-                animator.Play("DieDown");
+            Debug.LogWarning($"⚠️ Erro ao tocar animação de morte: {e.Message}");
         }
     }
     

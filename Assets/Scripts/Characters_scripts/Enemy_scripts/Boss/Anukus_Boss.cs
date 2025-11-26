@@ -557,21 +557,25 @@ public class Anukus_Boss : Enemy
         
         try
         {
-            string animPrefix = isCurrentlyMoving ? "Walk" : "Idle";
+            // Prefixo com nome da pasta
+            string folderPrefix = isCurrentlyMoving ? "Walk." : "Idle.";
+            string animSuffix;
             
             // Determina direção
             if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
             {
-                animator.Play(animPrefix + "Side");
+                animSuffix = isCurrentlyMoving ? "WalkSide" : "IdleSide";
                 transform.localScale = direction.x > 0 ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
             }
             else
             {
                 if (direction.y > 0)
-                    animator.Play(animPrefix + "Up");
+                    animSuffix = isCurrentlyMoving ? "WalkUp" : "IdleUp";
                 else
-                    animator.Play(animPrefix + "Down");
+                    animSuffix = isCurrentlyMoving ? "WalkDown" : "IdleDown";
             }
+            
+            animator.Play(folderPrefix + animSuffix);
         }
         catch (System.Exception e)
         {
@@ -583,51 +587,26 @@ public class Anukus_Boss : Enemy
     {
         if (animator == null || !animator.isActiveAndEnabled) return;
         
-        // Proteção extra contra Animator Controller corrompido
         try
         {
             // Determina direção do ataque
             if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
             {
-                // Tenta tocar a animação, mas não gera erro se não existir
-                if (HasAnimationState("AttackSide"))
-                    animator.Play("AttackSide");
-                
+                animator.Play("Attack.AttackSide");
                 transform.localScale = direction.x > 0 ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
             }
             else
             {
                 if (direction.y > 0)
-                {
-                    if (HasAnimationState("AttackUp"))
-                        animator.Play("AttackUp");
-                }
+                    animator.Play("Attack.AttackUp");
                 else
-                {
-                    if (HasAnimationState("AttackDown"))
-                        animator.Play("AttackDown");
-                    else
-                        animator.Play("IdleDown"); // Fallback
-                }
+                    animator.Play("Attack.AttackDown");
             }
         }
         catch (System.Exception e)
         {
             Debug.LogWarning($"⚠️ Erro ao tocar animação de ataque: {e.Message}");
         }
-    }
-    
-    bool HasAnimationState(string stateName)
-    {
-        if (animator == null) return false;
-        
-        foreach (AnimatorControllerParameter param in animator.parameters)
-        {
-            // Se encontrar qualquer parâmetro, significa que o animator está configurado
-        }
-        
-        // Tenta tocar e captura exceção silenciosamente
-        return true; // Por enquanto assume que existe
     }
     
     // ========================================
@@ -716,6 +695,12 @@ public class Anukus_Boss : Enemy
             bossSprite.color = originalColor;
         
         PlayDeathAnimation();
+
+        if (VictoryManager.Instance != null)
+        {
+            VictoryManager.Instance.NotifyBossDeath();
+            Debug.Log("NotifyBossDeath enviado para VictoryManager.");
+        }
         
         StartCoroutine(DestroyAfterDeathAnimation());
     }
@@ -736,17 +721,24 @@ public class Anukus_Boss : Enemy
             return;
         }
         
-        if (Mathf.Abs(lastFacingDirection.x) > Mathf.Abs(lastFacingDirection.y))
+        try
         {
-            animator.Play("DieSide");
-            transform.localScale = lastFacingDirection.x > 0 ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
-        }
-        else
-        {
-            if (lastFacingDirection.y > 0)
-                animator.Play("DieUp");
+            if (Mathf.Abs(lastFacingDirection.x) > Mathf.Abs(lastFacingDirection.y))
+            {
+                animator.Play("Die.DieSide");
+                transform.localScale = lastFacingDirection.x > 0 ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
+            }
             else
-                animator.Play("DieDown");
+            {
+                if (lastFacingDirection.y > 0)
+                    animator.Play("Die.DieUp");
+                else
+                    animator.Play("Die.DieDown");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"⚠️ Erro ao tocar animação de morte: {e.Message}");
         }
     }
     
