@@ -307,7 +307,7 @@ MonoBehaviour:
   attackCooldown: 1
   flipSpriteBasedOnDirection: 1
   healthBarCanvas: {fileID: 5607408967107046977}
-  attackSound: {fileID: 0}
+  attackSound: {fileID: 8300000, guid: fd70ff57ebbe5624ca3d0002f8addd44, type: 3}
   stalkSpeed: 2
   chaseRange: 10
   chaseSpeed: 4
@@ -337,7 +337,7 @@ MonoBehaviour:
   flashDuration: 0.1
   healthBarScript: {fileID: 7778283524896660000}
   hurtSound: {fileID: 0}
-  deathSound: {fileID: 0}
+  deathSound: {fileID: 8300000, guid: 48073ea9fad510840ae65b2014dd5095, type: 3}
   deathEffect: {fileID: 0}
   deathDelay: 0.1
   shakeOnDeath: 1

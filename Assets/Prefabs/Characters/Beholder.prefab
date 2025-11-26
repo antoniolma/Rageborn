@@ -176,7 +176,7 @@ MonoBehaviour:
   flashDuration: 0.1
   healthBarScript: {fileID: 6848707306374195633}
   hurtSound: {fileID: 0}
-  deathSound: {fileID: 0}
+  deathSound: {fileID: 8300000, guid: 07d3624388187494abe549889a6a4704, type: 3}
   deathEffect: {fileID: 0}
   deathDelay: 0.1
   shakeOnDeath: 1

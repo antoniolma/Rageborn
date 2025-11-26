@@ -167,10 +167,25 @@ public class FireWorm : Enemy
         // Ativa a hitbox após o delay (quando a animação chegar na mordida)
         Invoke(nameof(ActivateBiteHitbox), hitboxActivationDelay);
         
-        // Toca som de ataque
-        if (audioSource != null && attackSound != null)
+        // Toca som de ataque (cria AudioSource temporário se necessário)
+        if (attackSound != null)
         {
-            audioSource.PlayOneShot(attackSound);
+            if (audioSource != null)
+            {
+                audioSource.volume = 0.75f; // 50% do volume
+                audioSource.PlayOneShot(attackSound);
+            }
+            else
+            {
+                // Se não tem AudioSource, cria um temporário
+                GameObject soundObject = new GameObject("AttackSound");
+                soundObject.transform.position = transform.position;
+                AudioSource tempAudioSource = soundObject.AddComponent<AudioSource>();
+                tempAudioSource.clip = attackSound;
+                tempAudioSource.volume = 0.75f; // 50% do volume
+                tempAudioSource.Play();
+                Destroy(soundObject, attackSound.length);
+            }
         }
         
         // Volta para animação de Stalk após a duração da animação

@@ -138,9 +138,15 @@ public class EnemyHealth : MonoBehaviour
         Debug.Log($"💀 {gameObject.name} morreu!");
         
         // ===== AUDIO =====
-        if (audioSource != null && deathSound != null)
+        if (deathSound != null)
         {
-            audioSource.PlayOneShot(deathSound);
+            // Cria um GameObject temporário para tocar o som (não será destruído com o inimigo)
+            GameObject soundObject = new GameObject("DeathSound");
+            AudioSource tempAudioSource = soundObject.AddComponent<AudioSource>();
+            tempAudioSource.clip = deathSound;
+            tempAudioSource.volume = 0.75f; // 50% do volume
+            tempAudioSource.Play();
+            Destroy(soundObject, deathSound.length);
         }
         
         // ===== SCREEN SHAKE =====

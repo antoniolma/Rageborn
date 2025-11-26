@@ -114,10 +114,25 @@ public class Beholder : Enemy
             projectileScript.Initialize(direction, damage);
         }
         
-        // Toca som de ataque
-        if (audioSource != null && attackSound != null)
+        // Toca som de ataque (cria AudioSource temporário se necessário)
+        if (attackSound != null)
         {
-            audioSource.PlayOneShot(attackSound);
+            if (audioSource != null)
+            {
+                audioSource.volume = 0.75f; // 50% do volume
+                audioSource.PlayOneShot(attackSound);
+            }
+            else
+            {
+                // Se não tem AudioSource, cria um temporário
+                GameObject soundObject = new GameObject("AttackSound");
+                soundObject.transform.position = transform.position;
+                AudioSource tempAudioSource = soundObject.AddComponent<AudioSource>();
+                tempAudioSource.clip = attackSound;
+                tempAudioSource.volume = 0.75f; // 50% do volume
+                tempAudioSource.Play();
+                Destroy(soundObject, attackSound.length);
+            }
         }
         
         Debug.Log("👁️ Beholder atirou projétil!");

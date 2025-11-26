@@ -246,7 +246,7 @@ MonoBehaviour:
   flashDuration: 0.1
   healthBarScript: {fileID: 2002139824345954032}
   hurtSound: {fileID: 0}
-  deathSound: {fileID: 0}
+  deathSound: {fileID: 8300000, guid: 8ae7e910de8509e4ca282b8ce414a5bd, type: 3}
   deathEffect: {fileID: 0}
   deathDelay: 0.1
   shakeOnDeath: 1
@@ -279,6 +279,7 @@ MonoBehaviour:
   dashSpeed: 10
   dashCooldown: 2.5
   dashChargeTime: 0.6
+  dashDuration: 0.5
   dashDamage: 7
   dashTrail: {fileID: 0}
   goblinSprite: {fileID: 0}
