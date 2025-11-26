@@ -7,14 +7,15 @@ TagManager:
   - Enemy
   - PlayerSpawn
   - Wall
+  - Hole
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - hole
   - Water
   - UI
-  - 
+  - projectile
   - 
   - 
   - 
@@ -43,6 +44,9 @@ TagManager:
   m_SortingLayers:
   - name: Background
     uniqueID: 3060536165
+    locked: 0
+  - name: Holes
+    uniqueID: 4205560151
     locked: 0
   - name: Ground
     uniqueID: 3465231859

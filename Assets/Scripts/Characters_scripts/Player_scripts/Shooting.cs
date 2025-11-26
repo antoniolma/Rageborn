@@ -146,7 +146,7 @@ public class Shooting : MonoBehaviour
             SwingAnim();
         }
 
-        if (!canFire && Time.time - fireTime >= cooldown)
+        if (!canFire && Time.time - fireTime >= GetCurrentCooldown())
         {
             canFire = true;
             fireTime = 0;
@@ -154,6 +154,19 @@ public class Shooting : MonoBehaviour
 
         // Atualiza o Sprite da espada (checa nulo)
         UpdateSwordSprite();
+    }
+
+    // ============================================================
+    // Calcula o cooldown atual baseado no attack speed do PlayerStats
+    float GetCurrentCooldown()
+    {
+        if (PlayerStats.Instance != null)
+        {
+            // Quanto maior o attackSpeed, menor o cooldown
+            float attackSpeed = PlayerStats.Instance.GetTotalAttackSpeed();
+            return cooldown / Mathf.Max(0.1f, attackSpeed); // Max evita divisão por zero
+        }
+        return cooldown;
     }
 
     // ============================================================
@@ -267,11 +280,14 @@ public class Shooting : MonoBehaviour
         if (swordTransform == null) return;
         if (swingCoroutine != null) return;
 
+        // Usa o cooldown atual baseado no attack speed
+        float currentCooldown = GetCurrentCooldown();
+
         // base times
-        float baseForwardTime = Mathf.Max(0.01f, cooldown * forwardFraction);
+        float baseForwardTime = Mathf.Max(0.01f, currentCooldown * forwardFraction);
         // aplica multiplicador para deixar a ida mais rápida
         float forwardTime = Mathf.Max(0.01f, baseForwardTime / Mathf.Max(0.0001f, forwardSpeedMultiplier));
-        float backTime = Mathf.Max(0.01f, cooldown - forwardTime);
+        float backTime = Mathf.Max(0.01f, currentCooldown - forwardTime);
 
         float flipSign = 1f;
         if (playerMovement != null)

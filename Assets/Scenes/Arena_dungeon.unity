@@ -184,6 +184,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0ad6222860a4c0e1ca5ad6c9dd49b598, type: 3}
+--- !u!1 &292091281 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7562004772892979297, guid: 3c280a799b79c09dc996fe47feae192b, type: 3}
+  m_PrefabInstance: {fileID: 1438950301837251395}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &378457838
 GameObject:
   m_ObjectHideFlags: 0
@@ -697,6 +702,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemySpawner
       objectReference: {fileID: 0}
+    - target: {fileID: 5904214892335503924, guid: c892d2b4a8d0a92c6965f8b7f802caac, type: 3}
+      propertyPath: shopDoor
+      value: 
+      objectReference: {fileID: 292091281}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -768,12 +777,24 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4926931683721760960, guid: 3c280a799b79c09dc996fe47feae192b, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.1360357
+      objectReference: {fileID: 0}
+    - target: {fileID: 4926931683721760960, guid: 3c280a799b79c09dc996fe47feae192b, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.8842888
+      objectReference: {fileID: 0}
+    - target: {fileID: 4926931683721760960, guid: 3c280a799b79c09dc996fe47feae192b, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2.1360357
+      objectReference: {fileID: 0}
+    - target: {fileID: 4926931683721760960, guid: 3c280a799b79c09dc996fe47feae192b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 10.01
       objectReference: {fileID: 0}
     - target: {fileID: 4926931683721760960, guid: 3c280a799b79c09dc996fe47feae192b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 12.08
+      value: 11.85
       objectReference: {fileID: 0}
     - target: {fileID: 4926931683721760960, guid: 3c280a799b79c09dc996fe47feae192b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -810,6 +831,10 @@ PrefabInstance:
     - target: {fileID: 7562004772892979297, guid: 3c280a799b79c09dc996fe47feae192b, type: 3}
       propertyPath: m_Name
       value: ShopDoorTrigger
+      objectReference: {fileID: 0}
+    - target: {fileID: 7562004772892979297, guid: 3c280a799b79c09dc996fe47feae192b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
