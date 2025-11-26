@@ -39,11 +39,16 @@ public class EnemyProjectile : MonoBehaviour
             speed = projectileSpeed;
         }
         
-        // Aplica velocidade
-        if (rb != null)
+        // Pega ou cria o Rigidbody aqui, não espera o Start()
+        rb = GetComponent<Rigidbody2D>();
+        if (rb == null)
         {
-            rb.linearVelocity = direction.normalized * speed;
+            rb = gameObject.AddComponent<Rigidbody2D>();
+            rb.gravityScale = 0;
         }
+        
+        // Aplica velocidade
+        rb.linearVelocity = direction.normalized * speed;
         
         // Rotaciona para a direção de movimento
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -67,7 +72,7 @@ public class EnemyProjectile : MonoBehaviour
         }
         
         // Acerta parede/obstáculo
-        if (other.CompareTag("Wall") || other.CompareTag("Obstacle"))
+        if (other.CompareTag("Wall"))
         {
             SpawnHitEffect();
             Destroy(gameObject);
@@ -91,7 +96,7 @@ public class EnemyProjectile : MonoBehaviour
         }
         
         // Acerta parede/obstáculo
-        if (collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Obstacle"))
+        if (collision.gameObject.CompareTag("Wall"))
         {
             SpawnHitEffect();
             Destroy(gameObject);

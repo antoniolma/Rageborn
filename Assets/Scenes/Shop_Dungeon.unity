@@ -540,6 +540,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6049bd683e0b57a77924b4d3662bcecc, type: 2}
   - {fileID: 11400000, guid: a78d7eff869fb5123a16bb91f44337c3, type: 2}
   - {fileID: 11400000, guid: 72664ef492ae1f2ad808258b29ecd926, type: 2}
+  - {fileID: 11400000, guid: eaeeeafe43ed059d38f5f9aa72df2ad8, type: 2}
+  - {fileID: 11400000, guid: 439c6f8d064fed1dfad88b3e0a4d3a25, type: 2}
   spawnPoints:
   - {fileID: 2144865472}
   - {fileID: 1519718792}
@@ -547,8 +549,8 @@ MonoBehaviour:
   - {fileID: 1303129581}
   - {fileID: 1193041558}
   - {fileID: 1516323002}
-  minItems: 3
-  maxItems: 5
+  minItems: 5
+  maxItems: 6
   allowDuplicates: 0
   portalToNextLevel: {fileID: 1160499171}
 --- !u!4 &1259033459

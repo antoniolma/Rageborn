@@ -7,10 +7,10 @@ public class PlayerController : MonoBehaviour
     private int currentHealth;
     
     private Rigidbody2D rb;
+    private bool isDead = false;
     
     void Start()
     {
-
         DontDestroyOnLoad(gameObject);
 
         rb = GetComponent<Rigidbody2D>();
@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviour
     
     public void TakeDamage(int damage)
     {
+        if (isDead) return;
+        
         currentHealth -= damage;
         Debug.Log($"Player HP: {currentHealth}/{maxHealth}");
         
@@ -36,19 +38,40 @@ public class PlayerController : MonoBehaviour
     
     private void Die()
     {
-        Debug.Log("Player morreu!");
-        // TODO: Implementar lógica de morte (restart, menu, etc)
+        if (isDead) return;
+        
+        isDead = true;
+        Debug.Log("💀 Player morreu!");
+        
+        // Chama o Game Over
+        if (GameOverManager.Instance != null)
+        {
+            GameOverManager.Instance.TriggerGameOver();
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ GameOverManager não encontrado!");
+        }
+        
         gameObject.SetActive(false);
     }
 
     public void IncreaseMaxHealth(int amount)
     {
         maxHealth += amount;
-        currentHealth += amount; // Também cura o valor aumentado
+        currentHealth += amount;
         currentHealth = Mathf.Min(currentHealth, maxHealth);
         Debug.Log($"❤️ Vida máxima aumentada em {amount}! Nova vida máxima: {maxHealth}");
     }
     
     public int GetCurrentHealth() => currentHealth;
     public int GetMaxHealth() => maxHealth;
+    
+    // Método para resetar o player (útil para reiniciar o jogo)
+    public void ResetPlayer()
+    {
+        isDead = false;
+        currentHealth = maxHealth;
+        gameObject.SetActive(true);
+    }
 }

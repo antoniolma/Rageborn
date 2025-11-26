@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Arena_dungeon.unity
     guid: b241a642886534c1798a19676801cb9d
+  - enabled: 1
+    path: Assets/Scenes/BossArena.unity
+    guid: 0f139ce7669348a4fb278534574f937a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

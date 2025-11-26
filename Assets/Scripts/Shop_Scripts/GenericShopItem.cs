@@ -78,6 +78,15 @@ public class GenericShopItem : InteractableItem
                     Debug.Log($"⚡ Velocidade de ataque aumentada em {itemValue}!");
                 }
                 break;
+
+            case ShopItemType.WeaponChange:
+                PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
+                if (playerMovement != null)
+                {
+                    playerMovement.TypeSword = itemValue; // 0 = Fire, 1 = Ice, 2 = Venom
+                    Debug.Log($"🗡️ Arma trocada para tipo {itemValue}!");
+                }
+                break;
         }
     }
 }

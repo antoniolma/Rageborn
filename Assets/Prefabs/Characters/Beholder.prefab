@@ -156,7 +156,7 @@ MonoBehaviour:
   hoverSpeed: 2
   hoverAmplitude: 0.5
   shootRange: 6
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 2861710933738747344, guid: dd75257bfc65e6e0885c16b9e8721e7e, type: 3}
   shootPoint: {fileID: 0}
 --- !u!114 &6117533535626771759
 MonoBehaviour:

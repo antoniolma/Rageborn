@@ -26,5 +26,6 @@ public enum ShopItemType
     DamageBoost,
     SpeedBoost,
     MaxHealthIncrease,
-    AttackSpeedBoost
+    AttackSpeedBoost,
+    WeaponChange
 }
