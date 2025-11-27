@@ -12,6 +12,7 @@ public class Beholder : Enemy
     
     private Vector3 targetPosition;
     private float hoverOffset;
+    private Rigidbody2D rb; // ✅ ADICIONADO
     
     protected override void Start()
     {
@@ -19,15 +20,30 @@ public class Beholder : Enemy
         maxHealth = 50;
         damage = 8;
         moveSpeed = 2f;
-        attackRange = 6f; // Ataque à distância
+        attackRange = 6f;
         attackCooldown = 2f;
         
         base.Start();
         
-        // Beholder não usa NavMeshAgent
+        // ✅ CONFIGURAÇÃO PARA VOO
         if (navAgent != null)
         {
             navAgent.enabled = false;
+        }
+        
+        // ✅ Configura Rigidbody2D para voo
+        rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.gravityScale = 0f; // ✅ SEM GRAVIDADE
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation; // ✅ NÃO GIRA
+        }
+        
+        // ✅ Configura Collider como Trigger (não colide fisicamente)
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null)
+        {
+            col.isTrigger = true; // ✅ PASSA ATRAVÉS DE PAREDES
         }
         
         hoverOffset = Random.Range(0f, Mathf.PI * 2f);
@@ -89,8 +105,17 @@ public class Beholder : Enemy
         float hover = Mathf.Sin(Time.time * hoverSpeed + hoverOffset) * hoverAmplitude;
         targetPosition.y += hover;
         
-        // Move suavemente para a posição alvo
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+        // ✅ Move usando Rigidbody2D (mais suave e física-friendly)
+        if (rb != null)
+        {
+            Vector2 newPosition = Vector2.MoveTowards(rb.position, targetPosition, moveSpeed * Time.deltaTime);
+            rb.MovePosition(newPosition);
+        }
+        else
+        {
+            // Fallback
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+        }
     }
     
     private void ShootProjectile()
@@ -114,22 +139,21 @@ public class Beholder : Enemy
             projectileScript.Initialize(direction, damage);
         }
         
-        // Toca som de ataque (cria AudioSource temporário se necessário)
+        // Toca som de ataque
         if (attackSound != null)
         {
             if (audioSource != null)
             {
-                audioSource.volume = 0.75f; // 50% do volume
+                audioSource.volume = 0.75f;
                 audioSource.PlayOneShot(attackSound);
             }
             else
             {
-                // Se não tem AudioSource, cria um temporário
                 GameObject soundObject = new GameObject("AttackSound");
                 soundObject.transform.position = transform.position;
                 AudioSource tempAudioSource = soundObject.AddComponent<AudioSource>();
                 tempAudioSource.clip = attackSound;
-                tempAudioSource.volume = 0.75f; // 50% do volume
+                tempAudioSource.volume = 0.75f;
                 tempAudioSource.Play();
                 Destroy(soundObject, attackSound.length);
             }
@@ -141,6 +165,11 @@ public class Beholder : Enemy
     protected override void AttackPlayer()
     {
         // Beholder não faz ataque corpo a corpo
-        // Usa ShootProjectile() ao invés
+    }
+    
+    // ✅ IMPORTANTE: Não colidir com player fisicamente, só detectar
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        // Pode adicionar lógica aqui se precisar
     }
 }
