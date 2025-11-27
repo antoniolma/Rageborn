@@ -29,6 +29,11 @@ public class Bob_Boss : Enemy
     [Header("📊 Visual")]
     [SerializeField] private SpriteRenderer bossSprite;
     [SerializeField] private Animator animator;
+    
+    [Header("🔊 Audio")]
+    [SerializeField] private AudioClip attackSound1;
+    [SerializeField] private AudioClip attackSound2;
+    [SerializeField] private AudioClip phase2Sound;
 
     [Header("Dash Safety")]
     [SerializeField] private float maxDashDistance = 10f;          // Distância máxima do dash (ajuste no Inspector)
@@ -375,6 +380,28 @@ public class Bob_Boss : Enemy
         // Após tempo de carga, dasha!
         if (Time.time >= stateStartTime + dashChargeTime)
         {
+            // 🔊 SOM DE DASH (escolhe aleatoriamente entre os dois)
+            AudioClip soundToPlay = Random.value > 0.5f ? attackSound1 : attackSound2;
+            
+            if (soundToPlay != null)
+            {
+                if (audioSource != null)
+                {
+                    audioSource.volume = 0.5f;
+                    audioSource.PlayOneShot(soundToPlay);
+                }
+                else
+                {
+                    GameObject soundObject = new GameObject("DashSound");
+                    soundObject.transform.position = transform.position;
+                    AudioSource tempAudioSource = soundObject.AddComponent<AudioSource>();
+                    tempAudioSource.clip = soundToPlay;
+                    tempAudioSource.volume = 0.5f;
+                    tempAudioSource.Play();
+                    Destroy(soundObject, soundToPlay.length);
+                }
+            }
+            
             ChangeState(BobState.Dashing);
             lastDashTime = Time.time;
         }
@@ -567,6 +594,26 @@ public class Bob_Boss : Enemy
         {
             rageParticles.gameObject.SetActive(true);
             rageParticles.Play();
+        }
+        
+        // 🔊 SOM DE FASE 2
+        if (phase2Sound != null)
+        {
+            if (audioSource != null)
+            {
+                audioSource.volume = 0.5f;
+                audioSource.PlayOneShot(phase2Sound);
+            }
+            else
+            {
+                GameObject soundObject = new GameObject("Phase2Sound");
+                soundObject.transform.position = transform.position;
+                AudioSource tempAudioSource = soundObject.AddComponent<AudioSource>();
+                tempAudioSource.clip = phase2Sound;
+                tempAudioSource.volume = 0.5f;
+                tempAudioSource.Play();
+                Destroy(soundObject, phase2Sound.length);
+            }
         }
         
         Debug.Log("⚡💥 BOB ENFURECEU! DASHES MAIS RÁPIDOS! 💥⚡");

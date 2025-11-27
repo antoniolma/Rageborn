@@ -147,8 +147,17 @@ public class PauseMenu : MonoBehaviour
     
     public void AjustarVolumeMusica(float volume)
     {
+        // Ajusta o volume do GameMusicManager
+        GameMusicManager musicManager = FindObjectOfType<GameMusicManager>();
+        if (musicManager != null)
+        {
+            musicManager.SetVolume(volume);
+        }
+        
         PlayerPrefs.SetFloat("VolumeMusica", volume);
         PlayerPrefs.Save();
+        
+        Debug.Log($"🎵 Volume da música ajustado para: {volume:F2}");
     }
     
     public void AjustarVolumeSFX(float volume)
@@ -176,7 +185,14 @@ public class PauseMenu : MonoBehaviour
             sliderVolumeMaster.value = 1f;
         
         if (sliderVolumeMusica != null)
-            sliderVolumeMusica.value = 0.7f;
+            sliderVolumeMusica.value = 0.15f;
+        
+        // Reseta o volume do GameMusicManager
+        GameMusicManager musicManager = FindObjectOfType<GameMusicManager>();
+        if (musicManager != null)
+        {
+            musicManager.SetVolume(0.15f);
+        }
         
         if (sliderVolumeSFX != null)
             sliderVolumeSFX.value = 0.8f;
@@ -206,9 +222,16 @@ public class PauseMenu : MonoBehaviour
         if (sliderVolumeMaster != null)
             sliderVolumeMaster.value = volumeMaster;
         
-        float volumeMusica = PlayerPrefs.GetFloat("VolumeMusica", 0.7f);
+        float volumeMusica = PlayerPrefs.GetFloat("VolumeMusica", 0.15f);
         if (sliderVolumeMusica != null)
             sliderVolumeMusica.value = volumeMusica;
+        
+        // Aplica o volume salvo ao GameMusicManager
+        GameMusicManager musicManager = FindObjectOfType<GameMusicManager>();
+        if (musicManager != null)
+        {
+            musicManager.SetVolume(volumeMusica);
+        }
         
         float volumeSFX = PlayerPrefs.GetFloat("VolumeSFX", 0.8f);
         if (sliderVolumeSFX != null)

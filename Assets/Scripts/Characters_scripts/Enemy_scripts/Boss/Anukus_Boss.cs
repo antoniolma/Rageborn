@@ -34,6 +34,11 @@ public class Anukus_Boss : Enemy
     [SerializeField] private Animator animator;
     [SerializeField] private float deathAnimationDuration = 1.5f;
     
+    [Header("🔊 Audio")]
+    [SerializeField] private AudioClip attackSound1;
+    [SerializeField] private AudioClip attackSound2;
+    [SerializeField] private AudioClip phase2Sound;
+    
     // Estado
     private enum AnukusState
     {
@@ -349,6 +354,29 @@ public class Anukus_Boss : Enemy
         {
             PlayAttackAnimation(attackDirection);
             
+            // ⚔️ SOM DE ATAQUE (escolhe aleatoriamente entre os dois)
+            AudioClip soundToPlay = Random.value > 0.5f ? attackSound1 : attackSound2;
+            
+            if (soundToPlay != null)
+            {
+                if (audioSource != null)
+                {
+                    audioSource.volume = 0.5f; // 50% do volume
+                    audioSource.PlayOneShot(soundToPlay);
+                }
+                else
+                {
+                    // Se não tem AudioSource, cria um temporário
+                    GameObject soundObject = new GameObject("AttackSound");
+                    soundObject.transform.position = transform.position;
+                    AudioSource tempAudioSource = soundObject.AddComponent<AudioSource>();
+                    tempAudioSource.clip = soundToPlay;
+                    tempAudioSource.volume = 0.5f; // 50% do volume
+                    tempAudioSource.Play();
+                    Destroy(soundObject, soundToPlay.length);
+                }
+            }
+            
             // ⚔️ POSICIONA A HITBOX IMEDIATAMENTE (mas ainda desativada)
             if (attackHitbox != null)
             {
@@ -647,6 +675,26 @@ public class Anukus_Boss : Enemy
         {
             rageParticles.gameObject.SetActive(true);
             rageParticles.Play();
+        }
+        
+        // 🔊 SOM DE FASE 2
+        if (phase2Sound != null)
+        {
+            if (audioSource != null)
+            {
+                audioSource.volume = 0.5f;
+                audioSource.PlayOneShot(phase2Sound);
+            }
+            else
+            {
+                GameObject soundObject = new GameObject("Phase2Sound");
+                soundObject.transform.position = transform.position;
+                AudioSource tempAudioSource = soundObject.AddComponent<AudioSource>();
+                tempAudioSource.clip = phase2Sound;
+                tempAudioSource.volume = 0.5f;
+                tempAudioSource.Play();
+                Destroy(soundObject, phase2Sound.length);
+            }
         }
         
         Debug.Log("⚔️💥 ANUKUS ENFURECEU! GOLPES DUPLOS! 💥⚔️");
