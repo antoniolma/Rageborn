@@ -205,12 +205,20 @@ public class GameMusicManager : MonoBehaviour
         Debug.Log($"✅ Todos os {newPlaylist.Length} clips estão OK!");
         
         currentPlaylist = newPlaylist;
-        currentTrackIndex = Random.Range(0, currentPlaylist.Length); // Começa em música aleatória
+        currentTrackIndex = Random.Range(0, currentPlaylist.Length);
         
         Debug.Log($"🎵 Índice aleatório escolhido: {currentTrackIndex}");
         
-        // Para a música atual imediatamente
-        audioSource.Stop();
+        // ✅ FORÇA PARADA COMPLETA
+        if (audioSource.isPlaying)
+        {
+            audioSource.Stop();
+            Debug.Log("🎵 Áudio anterior parado.");
+        }
+        
+        // ✅ DESLIGA E LIGA O AUDIOSOURCE (reset forçado)
+        audioSource.enabled = false;
+        audioSource.enabled = true;
         
         // Verifica se o clip existe
         if (currentPlaylist[currentTrackIndex] == null)
@@ -219,16 +227,50 @@ public class GameMusicManager : MonoBehaviour
             return;
         }
         
-        // Toca a nova música
+        // ✅ CONFIGURA TUDO ANTES DE TOCAR
         audioSource.clip = currentPlaylist[currentTrackIndex];
         audioSource.volume = volume;
-        audioSource.spatialBlend = 0f; // Força 2D
-        audioSource.priority = 0; // Máxima prioridade
-        audioSource.mute = false; // Garante que não está mudo
-        audioSource.enabled = true; // Garante que está ativado
+        audioSource.spatialBlend = 0f;
+        audioSource.priority = 0;
+        audioSource.mute = false;
+        audioSource.loop = false;
+        audioSource.time = 0f; // ✅ FORÇA INÍCIO DO ÁUDIO
+        
+        // ✅ TOCA E VERIFICA IMEDIATAMENTE
         audioSource.Play();
         
-        Debug.Log($"🎵 Mudou para: {audioSource.clip.name} | Volume: {audioSource.volume} | isPlaying: {audioSource.isPlaying} | mute: {audioSource.mute} | AudioSource em: {audioSource.gameObject.name} | spatialBlend: {audioSource.spatialBlend}");
+        Debug.Log($"🎵 audioSource.Play() chamado! Clip: {audioSource.clip.name}");
+        
+        // ✅ VERIFICA SE REALMENTE TOCOU
+        StartCoroutine(VerifyPlaybackAfterFrame());
+    }
+
+    private IEnumerator VerifyPlaybackAfterFrame()
+    {
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(0.1f);
+        
+        bool isActuallyPlaying = audioSource.isPlaying;
+        float currentTime = audioSource.time;
+        
+        Debug.Log($"🎵 VERIFICAÇÃO PÓS-PLAY:");
+        Debug.Log($"   - isPlaying: {isActuallyPlaying}");
+        Debug.Log($"   - time: {currentTime}");
+        Debug.Log($"   - clip: {audioSource.clip?.name ?? "NULL"}");
+        Debug.Log($"   - volume: {audioSource.volume}");
+        Debug.Log($"   - enabled: {audioSource.enabled}");
+        Debug.Log($"   - gameObject.activeInHierarchy: {gameObject.activeInHierarchy}");
+        
+        if (!isActuallyPlaying)
+        {
+            Debug.LogError($"❌ CRÍTICO: AudioSource NÃO ESTÁ TOCANDO após Play()!");
+            Debug.LogError($"❌ Tentando PlayOneShot como workaround...");
+            audioSource.PlayOneShot(audioSource.clip, volume);
+        }
+        else
+        {
+            Debug.Log($"✅ Áudio confirmado tocando!");
+        }
     }
     
     /// <summary>
@@ -276,11 +318,18 @@ public class GameMusicManager : MonoBehaviour
     bool IsGameScene(string sceneName)
     {
         // Arenas de jogo hardcoded
-        bool isGame = sceneName == "Arena_Inferno" || 
-                      sceneName == "Arena_dungeon" || 
-                      sceneName == "Shop_Dungeon";
+        bool isArenaInferno = sceneName == "Arena_Inferno";
+        bool isArenaDungeon = sceneName == "Arena_dungeon";
+        bool isShopDungeon = sceneName == "Shop_Dungeon";
         
-        Debug.Log($"🎵 IsGameScene('{sceneName}') = {isGame}");
+        Debug.Log($"🎵 IsGameScene('{sceneName}'):");
+        Debug.Log($"   - Arena_Inferno? {isArenaInferno}");
+        Debug.Log($"   - Arena_dungeon? {isArenaDungeon}");
+        Debug.Log($"   - Shop_Dungeon? {isShopDungeon}");
+        
+        bool isGame = isArenaInferno || isArenaDungeon || isShopDungeon;
+        
+        Debug.Log($"   - RESULTADO FINAL: {isGame}");
         return isGame;
     }
     

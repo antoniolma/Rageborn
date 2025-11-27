@@ -148,10 +148,10 @@ MonoBehaviour:
   damage: 10
   moveSpeed: 2
   attackRange: 1.5
-  attackCooldown: 1
+  attackCooldown: 0.2
   flipSpriteBasedOnDirection: 1
   healthBarCanvas: {fileID: 0}
-  attackSound: {fileID: 0}
+  attackSound: {fileID: 8300000, guid: ef00109e483d9b35293603f6c3870faf, type: 3}
   flyHeight: 2
   hoverSpeed: 2
   hoverAmplitude: 0.5

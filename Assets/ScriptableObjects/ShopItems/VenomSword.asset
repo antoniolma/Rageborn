@@ -17,7 +17,7 @@ MonoBehaviour:
 
 '
   itemSprite: {fileID: 1330965007, guid: df6696df7563e004bb4e24484af1f2b7, type: 3}
-  price: 2000
+  price: 1500
   itemType: 5
   value: 2
   itemPrefab: {fileID: 6307555995846362847, guid: c19350e99d8a829058ff7f0a61f959b4, type: 3}

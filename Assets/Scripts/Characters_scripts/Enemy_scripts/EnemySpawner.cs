@@ -14,17 +14,17 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private Vector2 spawnAreaMax = new Vector2(10, 10);
     
     [Header("Wave Settings")]
-    [SerializeField] private int startingWaves = 3;
+    [SerializeField] private int startingWaves = 2; // ✅ REDUZIDO de 3 para 2
     [SerializeField] private int baseEnemiesPerWave = 5;
     [SerializeField] private float timeBetweenWaves = 5f;
     [SerializeField] private float timeBetweenSpawns = 0.5f;
     
     [Header("Difficulty Scaling")]
     [SerializeField] private bool enableDifficultyScaling = true;
-    [SerializeField] private float enemyIncreasePerRoom = 1.5f; // +50% inimigos por room
-    [SerializeField] private float waveIncreasePerRoom = 0.5f; // +0.5 waves por room
-    [SerializeField] private int maxEnemiesPerWave = 20;
-    [SerializeField] private int maxWaves = 8;
+    [SerializeField] private float enemyIncreasePerRoom = 1.3f; // ✅ REDUZIDO de 1.5 para 1.3 (+30% ao invés de +50%)
+    [SerializeField] private float waveIncreasePerRoom = 0.3f; // ✅ REDUZIDO de 0.5 para 0.3
+    [SerializeField] private int maxEnemiesPerWave = 15; // ✅ REDUZIDO de 20 para 15
+    [SerializeField] private int maxWaves = 4; // ✅ LIMITE MÁXIMO: 4 WAVES
     
     [Header("Shop Door")]
     [SerializeField] private GameObject shopDoor;
@@ -86,7 +86,7 @@ public class EnemySpawner : MonoBehaviour
             // Aumenta número de waves conforme progride
             float waveMultiplier = 1 + ((currentRoomNumber - 1) * waveIncreasePerRoom);
             totalWaves = Mathf.RoundToInt(startingWaves * waveMultiplier);
-            totalWaves = Mathf.Min(totalWaves, maxWaves);
+            totalWaves = Mathf.Min(totalWaves, maxWaves); // ✅ GARANTE MÁXIMO DE 4
             
             // Aumenta número de inimigos por wave
             float enemyMultiplier = Mathf.Pow(enemyIncreasePerRoom, currentRoomNumber - 1);
@@ -97,7 +97,7 @@ public class EnemySpawner : MonoBehaviour
         }
         else
         {
-            totalWaves = startingWaves;
+            totalWaves = Mathf.Min(startingWaves, maxWaves); // ✅ GARANTE MÁXIMO DE 4
             enemiesPerWave = baseEnemiesPerWave;
         }
     }

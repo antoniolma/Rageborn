@@ -360,9 +360,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1088547830}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 30, y: -15}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 172, y: 27}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &140810784
@@ -1109,9 +1109,9 @@ RectTransform:
   - {fileID: 1783450473}
   m_Father: {fileID: 1088547830}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 10, y: -15}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &312718421
@@ -2346,7 +2346,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 5dd6fb5440f064f4fa19ba69430c6f41, type: 3}
   - {fileID: 8300000, guid: 0d05c3ea23f300543b05b12de774e34b, type: 3}
   volume: 0.5
-  bossSceneName: BossArena
 --- !u!4 &716245045
 Transform:
   m_ObjectHideFlags: 0

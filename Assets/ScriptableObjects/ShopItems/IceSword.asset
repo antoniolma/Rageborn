@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: Ice Sword
   description: Dispara projeteis de gelo
   itemSprite: {fileID: 1753369541, guid: 5db9b4d51eaa6794c9a4c20969c0815b, type: 3}
-  price: 1000
+  price: 800
   itemType: 5
   value: 1
   itemPrefab: {fileID: 6307555995846362847, guid: c19350e99d8a829058ff7f0a61f959b4, type: 3}

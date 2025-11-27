@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: "Ma\xE7\xE3"
   description: Restaura uma porcao da  vida
   itemSprite: {fileID: -6528357419274593504, guid: 06feca3d4a5a3a6ebb228627d0dc3a7f, type: 3}
-  price: 100
+  price: 50
   itemType: 0
   value: 25
   itemPrefab: {fileID: 6307555995846362847, guid: c19350e99d8a829058ff7f0a61f959b4, type: 3}

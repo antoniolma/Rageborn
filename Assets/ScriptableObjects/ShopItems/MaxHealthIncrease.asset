@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: Amuleto da Gula
   description: "Aumenta a vida m\xE1xima"
   itemSprite: {fileID: 4126832036615604095, guid: 8b0adc6f254b198d7a37cfd00d8aad57, type: 3}
-  price: 400
+  price: 200
   itemType: 3
   value: 25
   itemPrefab: {fileID: 6307555995846362847, guid: c19350e99d8a829058ff7f0a61f959b4, type: 3}

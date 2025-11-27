@@ -10,13 +10,7 @@ public class CameraShake : MonoBehaviour
     [Header("Shake Curve (Optional)")]
     [SerializeField] private AnimationCurve shakeCurve = AnimationCurve.Linear(0, 1, 1, 0);
     
-    private Vector3 originalPosition;
     private bool isShaking = false;
-    
-    void Start()
-    {
-        originalPosition = transform.localPosition;
-    }
     
     // Método principal - chame este para fazer shake
     public void Shake(float duration, float intensity)
@@ -36,6 +30,10 @@ public class CameraShake : MonoBehaviour
     IEnumerator ShakeCoroutine(float duration, float intensity)
     {
         isShaking = true;
+        
+        // ✅ CORREÇÃO: Salva posição ANTES do shake, não no Start()
+        Vector3 originalPosition = transform.localPosition;
+        
         float elapsed = 0f;
         
         while (elapsed < duration)
@@ -74,6 +72,9 @@ public class CameraShake : MonoBehaviour
     {
         isShaking = true;
         
+        // ✅ CORREÇÃO: Salva posição ANTES do shake
+        Vector3 originalPosition = transform.localPosition;
+        
         // Shake súbito
         float x = Random.Range(-1f, 1f) * intensity;
         float y = Random.Range(-1f, 1f) * intensity;
@@ -97,14 +98,5 @@ public class CameraShake : MonoBehaviour
         
         transform.localPosition = originalPosition;
         isShaking = false;
-    }
-    
-    // Atualiza posição original (útil se a câmera se mover)
-    public void UpdateOriginalPosition()
-    {
-        if (!isShaking)
-        {
-            originalPosition = transform.localPosition;
-        }
     }
 }
